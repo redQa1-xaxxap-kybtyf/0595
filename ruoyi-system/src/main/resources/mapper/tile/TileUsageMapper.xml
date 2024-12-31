@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.tile.mapper.TileUsageMapper">
+    
+    <resultMap type="TileUsage" id="TileUsageResult">
+        <result property="usageId"    column="usage_id"    />
+        <result property="usageName"  column="usage_name"  />
+        <result property="orderNum"   column="order_num"   />
+        <result property="status"     column="status"      />
+        <result property="createBy"   column="create_by"   />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy"   column="update_by"   />
+        <result property="updateTime" column="update_time" />
+        <result property="remark"     column="remark"      />
+    </resultMap>
+
+    <sql id="selectTileUsageVo">
+        select usage_id, usage_name, order_num, status, create_by, create_time, update_by, update_time, remark
+        from tile_usage
+    </sql>
+
+    <select id="selectTileUsageList" parameterType="TileUsage" resultMap="TileUsageResult">
+        <include refid="selectTileUsageVo"/>
+        <where>
+            <if test="usageName != null and usageName != ''">
+                AND usage_name like concat('%', #{usageName}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+        order by order_num
+    </select>
+    
+    <select id="selectTileUsageById" parameterType="Long" resultMap="TileUsageResult">
+        <include refid="selectTileUsageVo"/>
+        where usage_id = #{usageId}
+    </select>
+
+    <select id="checkUsageNameUnique" parameterType="String" resultMap="TileUsageResult">
+        <include refid="selectTileUsageVo"/>
+        where usage_name = #{usageName} limit 1
+    </select>
+        
+    <insert id="insertTileUsage" parameterType="TileUsage" useGeneratedKeys="true" keyProperty="usageId">
+        insert into tile_usage
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="usageName != null">usage_name,</if>
+            <if test="orderNum != null">order_num,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="usageName != null">#{usageName},</if>
+            <if test="orderNum != null">#{orderNum},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTileUsage" parameterType="TileUsage">
+        update tile_usage
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="usageName != null">usage_name = #{usageName},</if>
+            <if test="orderNum != null">order_num = #{orderNum},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where usage_id = #{usageId}
+    </update>
+
+    <delete id="deleteTileUsageById" parameterType="Long">
+        delete from tile_usage where usage_id = #{usageId}
+    </delete>
+
+    <delete id="deleteTileUsageByIds" parameterType="String">
+        delete from tile_usage where usage_id in 
+        <foreach item="usageId" collection="array" open="(" separator="," close=")">
+            #{usageId}
+        </foreach>
+    </delete>
+</mapper>

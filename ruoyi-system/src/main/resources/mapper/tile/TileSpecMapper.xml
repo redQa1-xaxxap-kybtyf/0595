@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.tile.mapper.TileSpecMapper">
+    
+    <resultMap type="TileSpec" id="TileSpecResult">
+        <result property="specId"      column="spec_id"      />
+        <result property="specName"    column="spec_name"    />
+        <result property="orderNum"    column="order_num"    />
+        <result property="status"      column="status"       />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"  column="create_time"  />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"  column="update_time"  />
+        <result property="remark"      column="remark"       />
+    </resultMap>
+
+    <sql id="selectTileSpecVo">
+        select spec_id, spec_name, order_num, status, create_by, create_time, update_by, update_time, remark
+        from tile_spec
+    </sql>
+
+    <select id="selectTileSpecList" parameterType="TileSpec" resultMap="TileSpecResult">
+        <include refid="selectTileSpecVo"/>
+        <where>
+            <if test="specName != null and specName != ''">
+                AND spec_name like concat('%', #{specName}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+        order by order_num
+    </select>
+    
+    <select id="selectTileSpecById" parameterType="Long" resultMap="TileSpecResult">
+        <include refid="selectTileSpecVo"/>
+        where spec_id = #{specId}
+    </select>
+
+    <select id="checkSpecNameUnique" parameterType="String" resultMap="TileSpecResult">
+        <include refid="selectTileSpecVo"/>
+        where spec_name = #{specName} limit 1
+    </select>
+        
+    <insert id="insertTileSpec" parameterType="TileSpec" useGeneratedKeys="true" keyProperty="specId">
+        insert into tile_spec
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="specName != null">spec_name,</if>
+            <if test="orderNum != null">order_num,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="specName != null">#{specName},</if>
+            <if test="orderNum != null">#{orderNum},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTileSpec" parameterType="TileSpec">
+        update tile_spec
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="specName != null">spec_name = #{specName},</if>
+            <if test="orderNum != null">order_num = #{orderNum},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where spec_id = #{specId}
+    </update>
+
+    <delete id="deleteTileSpecById" parameterType="Long">
+        delete from tile_spec where spec_id = #{specId}
+    </delete>
+
+    <delete id="deleteTileSpecByIds" parameterType="String">
+        delete from tile_spec where spec_id in 
+        <foreach item="specId" collection="array" open="(" separator="," close=")">
+            #{specId}
+        </foreach>
+    </delete>
+</mapper>

@@ -26,16 +26,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </sql>
 
     <select id="selectTileCategoryList" parameterType="TileCategory" resultMap="TileCategoryResult">
-        WITH RECURSIVE category_tree AS (
-            -- 获取所有顶级分类
-            SELECT * FROM tile_category WHERE parent_id = 0
-            UNION ALL
-            -- 递归获取子分类
-            SELECT c.* 
-            FROM tile_category c
-            INNER JOIN category_tree ct ON c.parent_id = ct.category_id
-        )
-        SELECT * FROM category_tree
+        <include refid="selectTileCategoryVo"/>
         <where>
             <if test="categoryName != null and categoryName != ''">
                 AND category_name like concat('%', #{categoryName}, '%')

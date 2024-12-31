@@ -41,10 +41,71 @@ public class TileCategoryServiceImpl implements ITileCategoryService
                 // 添加父节点链
                 addParentChain(result, item);
             }
-            return result;
+            return buildTree(result);
         }
         
-        return categories;
+        return buildTree(categories);
+    }
+
+    /**
+     * 构建树形结构
+     */
+    private List<TileCategory> buildTree(List<TileCategory> categories) {
+        List<TileCategory> returnList = new ArrayList<>();
+        List<Long> tempList = new ArrayList<>();
+        
+        for (TileCategory item : categories) {
+            tempList.add(item.getCategoryId());
+        }
+        
+        for (TileCategory item : categories) {
+            // 如果是顶级节点或父节点不在当前列表中，则直接添加
+            if (item.getParentId() == 0L || !tempList.contains(item.getParentId())) {
+                recursionFn(categories, item);
+                returnList.add(item);
+            }
+        }
+        
+        if (returnList.isEmpty()) {
+            returnList = categories;
+        }
+        
+        return returnList;
+    }
+
+    /**
+     * 递归列表
+     */
+    private void recursionFn(List<TileCategory> list, TileCategory t) {
+        // 得到子节点列表
+        List<TileCategory> childList = getChildList(list, t);
+        t.setChildren(childList);
+        for (TileCategory tChild : childList) {
+            // 判断是否有子节点
+            if (hasChild(list, tChild)) {
+                recursionFn(list, tChild);
+            }
+        }
+    }
+
+    /**
+     * 得到子节点列表
+     */
+    private List<TileCategory> getChildList(List<TileCategory> list, TileCategory t) {
+        List<TileCategory> tlist = new ArrayList<>();
+        for (TileCategory n : list) {
+            if (n.getParentId().longValue() == t.getCategoryId().longValue()) {
+                tlist.add(n);
+            }
+        }
+        return tlist;
+    }
+
+    /**
+     * 判断是否有子节点
+     */
+    private boolean hasChild(List<TileCategory> list, TileCategory t) {
+        return !getChildList(list, t).isEmpty();
     }
 
     /**

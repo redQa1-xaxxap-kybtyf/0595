@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.tile.mapper.TileMaterialMapper">
+    
+    <resultMap type="TileMaterial" id="TileMaterialResult">
+        <result property="materialId"   column="material_id"   />
+        <result property="materialName" column="material_name" />
+        <result property="orderNum"     column="order_num"     />
+        <result property="status"       column="status"        />
+        <result property="createBy"     column="create_by"     />
+        <result property="createTime"   column="create_time"   />
+        <result property="updateBy"     column="update_by"     />
+        <result property="updateTime"   column="update_time"   />
+        <result property="remark"       column="remark"        />
+    </resultMap>
+
+    <sql id="selectTileMaterialVo">
+        select material_id, material_name, order_num, status, create_by, create_time, update_by, update_time, remark
+        from tile_material
+    </sql>
+
+    <select id="selectTileMaterialList" parameterType="TileMaterial" resultMap="TileMaterialResult">
+        <include refid="selectTileMaterialVo"/>
+        <where>
+            <if test="materialName != null and materialName != ''">
+                AND material_name like concat('%', #{materialName}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+        order by order_num
+    </select>
+    
+    <select id="selectTileMaterialById" parameterType="Long" resultMap="TileMaterialResult">
+        <include refid="selectTileMaterialVo"/>
+        where material_id = #{materialId}
+    </select>
+
+    <select id="checkMaterialNameUnique" parameterType="String" resultMap="TileMaterialResult">
+        <include refid="selectTileMaterialVo"/>
+        where material_name = #{materialName} limit 1
+    </select>
+        
+    <insert id="insertTileMaterial" parameterType="TileMaterial" useGeneratedKeys="true" keyProperty="materialId">
+        insert into tile_material
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="materialName != null">material_name,</if>
+            <if test="orderNum != null">order_num,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="materialName != null">#{materialName},</if>
+            <if test="orderNum != null">#{orderNum},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTileMaterial" parameterType="TileMaterial">
+        update tile_material
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="materialName != null">material_name = #{materialName},</if>
+            <if test="orderNum != null">order_num = #{orderNum},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where material_id = #{materialId}
+    </update>
+
+    <delete id="deleteTileMaterialById" parameterType="Long">
+        delete from tile_material where material_id = #{materialId}
+    </delete>
+
+    <delete id="deleteTileMaterialByIds" parameterType="String">
+        delete from tile_material where material_id in 
+        <foreach item="materialId" collection="array" open="(" separator="," close=")">
+            #{materialId}
+        </foreach>
+    </delete>
+</mapper>
