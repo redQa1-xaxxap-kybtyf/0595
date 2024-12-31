@@ -12,6 +12,8 @@
 </template>
 
 <script setup>
+import { onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import iframeToggle from "./IframeToggle/index"
 import useTagsViewStore from '@/store/modules/tagsView'
 
@@ -22,7 +24,8 @@ onMounted(() => {
   addIframe()
 })
 
-watch((route) => {
+// 修改为Vue 3的watch写法
+watch(() => route.path, () => {
   addIframe()
 })
 
@@ -80,4 +83,3 @@ function addIframe() {
   border-radius: 3px;
 }
 </style>
-

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.tile.mapper.TileCategoryMapper">
+    
+    <resultMap type="TileCategory" id="TileCategoryResult">
+        <result property="categoryId"    column="category_id"    />
+        <result property="parentId"      column="parent_id"      />
+        <result property="ancestors"     column="ancestors"      />
+        <result property="categoryName"  column="category_name"  />
+        <result property="orderNum"      column="order_num"      />
+        <result property="level"         column="level"          />
+        <result property="visible"       column="visible"        />
+        <result property="categoryImage" column="category_image" />
+        <result property="goodsCount"    column="goods_count"    />
+        <result property="createBy"      column="create_by"      />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"      column="update_by"      />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectTileCategoryVo">
+        select category_id, parent_id, ancestors, category_name, order_num, level, visible, category_image, goods_count, create_by, create_time, update_by, update_time
+        from tile_category
+    </sql>
+
+    <select id="selectTileCategoryList" parameterType="TileCategory" resultMap="TileCategoryResult">
+        WITH RECURSIVE category_tree AS (
+            -- 获取所有顶级分类
+            SELECT * FROM tile_category WHERE parent_id = 0
+            UNION ALL
+            -- 递归获取子分类
+            SELECT c.* 
+            FROM tile_category c
+            INNER JOIN category_tree ct ON c.parent_id = ct.category_id
+        )
+        SELECT * FROM category_tree
+        <where>
+            <if test="categoryName != null and categoryName != ''">
+                AND category_name like concat('%', #{categoryName}, '%')
+            </if>
+            <if test="visible != null and visible != ''">
+                AND visible = #{visible}
+            </if>
+        </where>
+        ORDER BY level, parent_id, order_num
+    </select>
+    
+    <select id="selectTileCategoryById" parameterType="Long" resultMap="TileCategoryResult">
+        <include refid="selectTileCategoryVo"/>
+        where category_id = #{categoryId}
+    </select>
+
+    <select id="selectChildrenCategoryById" parameterType="Long" resultMap="TileCategoryResult">
+        <include refid="selectTileCategoryVo"/>
+        where find_in_set(#{categoryId}, ancestors)
+    </select>
+        
+    <insert id="insertTileCategory" parameterType="TileCategory" useGeneratedKeys="true" keyProperty="categoryId">
+        insert into tile_category
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="parentId != null">parent_id,</if>
+            <if test="ancestors != null">ancestors,</if>
+            <if test="categoryName != null">category_name,</if>
+            <if test="orderNum != null">order_num,</if>
+            <if test="level != null">level,</if>
+            <if test="visible != null">visible,</if>
+            <if test="categoryImage != null">category_image,</if>
+            <if test="goodsCount != null">goods_count,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="parentId != null">#{parentId},</if>
+            <if test="ancestors != null">#{ancestors},</if>
+            <if test="categoryName != null">#{categoryName},</if>
+            <if test="orderNum != null">#{orderNum},</if>
+            <if test="level != null">#{level},</if>
+            <if test="visible != null">#{visible},</if>
+            <if test="categoryImage != null">#{categoryImage},</if>
+            <if test="goodsCount != null">#{goodsCount},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTileCategory" parameterType="TileCategory">
+        update tile_category
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="ancestors != null">ancestors = #{ancestors},</if>
+            <if test="categoryName != null">category_name = #{categoryName},</if>
+            <if test="orderNum != null">order_num = #{orderNum},</if>
+            <if test="level != null">level = #{level},</if>
+            <if test="visible != null">visible = #{visible},</if>
+            <if test="categoryImage != null">category_image = #{categoryImage},</if>
+            <if test="goodsCount != null">goods_count = #{goodsCount},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where category_id = #{categoryId}
+    </update>
+
+    <delete id="deleteTileCategoryById" parameterType="Long">
+        delete from tile_category where category_id = #{categoryId} or find_in_set(#{categoryId}, ancestors)
+    </delete>
+
+    <select id="selectChildrenCategoryList" parameterType="Long" resultMap="TileCategoryResult">
+        <include refid="selectTileCategoryVo"/>
+        where find_in_set(#{categoryId}, ancestors)
+    </select>
+
+</mapper>

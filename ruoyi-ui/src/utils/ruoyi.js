@@ -1,5 +1,3 @@
-
-
 /**
  * 通用js方法封装处理
  * Copyright (c) 2019 ruoyi
@@ -112,6 +110,11 @@ export function selectDictLabels(datas, value, separator) {
   return actions.join('').substring(0, actions.join('').length - 1);
 }
 
+// 通用下载方法
+export function download(fileName) {
+  // 已有代码
+}
+
 // 字符串格式化(%s )
 export function sprintf(str) {
   var args = arguments, flag = true, i = 1;
@@ -158,53 +161,66 @@ export function mergeRecursive(source, target) {
  * @param {*} children 孩子节点字段 默认 'children'
  */
 export function handleTree(data, id, parentId, children) {
-  let config = {
-    id: id || 'id',
-    parentId: parentId || 'parentId',
-    childrenList: children || 'children'
-  };
+  id = id || 'id'
+  parentId = parentId || 'parentId'
+  children = children || 'children'
+  const result = []
+  const temp = {}
 
-  var childrenListMap = {};
-  var nodeIds = {};
-  var tree = [];
+  // 以ID为键，存储所有节点
+  data.forEach((item) => {
+    temp[item[id]] = { ...item }
+  })
 
-  for (let d of data) {
-    let parentId = d[config.parentId];
-    if (childrenListMap[parentId] == null) {
-      childrenListMap[parentId] = [];
-    }
-    nodeIds[d[config.id]] = d;
-    childrenListMap[parentId].push(d);
-  }
-
-  for (let d of data) {
-    let parentId = d[config.parentId];
-    if (nodeIds[parentId] == null) {
-      tree.push(d);
-    }
-  }
-
-  for (let t of tree) {
-    adaptToChildrenList(t);
-  }
-
-  function adaptToChildrenList(o) {
-    if (childrenListMap[o[config.id]] !== null) {
-      o[config.childrenList] = childrenListMap[o[config.id]];
-    }
-    if (o[config.childrenList]) {
-      for (let c of o[config.childrenList]) {
-        adaptToChildrenList(c);
+  // 构建树形结构
+  data.forEach((item) => {
+    const tempParent = temp[item[parentId]]
+    if (tempParent) {
+      if (!tempParent[children]) {
+        tempParent[children] = []
       }
+      // 确保子节点数组已排序
+      tempParent[children].push(temp[item[id]])
+      tempParent[children].sort((a, b) => {
+        if (a.level !== b.level) {
+          return a.level - b.level
+        }
+        return a.orderNum - b.orderNum
+      })
+    } else {
+      result.push(temp[item[id]])
     }
-  }
-  return tree;
+  })
+
+  // 对结果进行排序
+  result.sort((a, b) => {
+    if (a.level !== b.level) {
+      return a.level - b.level
+    }
+    return a.orderNum - b.orderNum
+  })
+
+  return result
 }
 
-/**
-* 参数处理
-* @param {*} params  参数
-*/
+// 验证是否为blob格式
+export function blobValidate(data) {
+  return data.type !== 'application/json'
+}
+
+// 返回项目路径
+export function getNormalPath(p) {
+  if (p.length === 0 || !p || p == 'undefined') {
+    return p
+  };
+  let res = p.replace('//', '/')
+  if (res[res.length - 1] === '/') {
+    return res.slice(0, res.length - 1)
+  }
+  return res;
+}
+
+// 参数处理
 export function tansParams(params) {
   let result = ''
   for (const propName of Object.keys(params)) {
@@ -225,22 +241,4 @@ export function tansParams(params) {
     }
   }
   return result
-}
-
-
-// 返回项目路径
-export function getNormalPath(p) {
-  if (p.length === 0 || !p || p == 'undefined') {
-    return p
-  };
-  let res = p.replace('//', '/')
-  if (res[res.length - 1] === '/') {
-    return res.slice(0, res.length - 1)
-  }
-  return res;
-}
-
-// 验证是否为blob格式
-export function blobValidate(data) {
-  return data.type !== 'application/json'
 }
