@@ -1,25 +1,21 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryFormRef" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item>
-        <label id="categoryNameLabel">分类名称</label>
+    <el-form :model="queryParams" ref="queryFormRef" :inline="true" v-show="showSearch" label-width="68px" class="search-form">
+      <el-form-item label="分类名称" style="margin-bottom: 0;">
         <el-input
-          id="categoryName"
           v-model="queryParams.categoryName"
           placeholder="请输入分类名称"
           clearable
+          style="width: 240px"
           @keyup.enter="handleQuery"
-          aria-labelledby="categoryNameLabel"
         />
       </el-form-item>
-      <el-form-item>
-        <label id="visibleSelectLabel">显示状态</label>
+      <el-form-item label="显示状态" style="margin-bottom: 0;">
         <el-select
-          id="visibleSelect"
           v-model="queryParams.visible"
           placeholder="显示状态"
           clearable
-          aria-labelledby="visibleSelectLabel"
+          style="width: 240px"
         >
           <el-option
             v-for="dict in sys_normal_disable"
@@ -29,7 +25,7 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item>
+      <el-form-item style="margin-bottom: 0;">
         <el-button type="primary" :icon="Search" @click="handleQuery">搜索</el-button>
         <el-button :icon="Refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
@@ -57,37 +53,92 @@
         children: 'children',
         hasChildren: 'hasChildren',
         lazy: false,
-        load: null
+        load: null,
+        indent: 26
       }"
       :height="500"
       :max-height="500"
+      border
+      stripe
+      highlight-current-row
+      style="margin-top: 10px;"
     >
-      <el-table-column prop="categoryName" label="分类名称" width="260"></el-table-column>
-      <el-table-column prop="orderNum" label="显示顺序" width="200"></el-table-column>
-      <el-table-column prop="visible" label="显示状态" width="100">
+      <el-table-column prop="categoryName" label="分类名称" min-width="260">
         <template #default="scope">
-          <dict-tag :options="sys_normal_disable" :value="scope.row.visible"/>
+          <div style="display: flex; align-items: center;">
+            <span :style="{ paddingLeft: (scope.row.level - 1) * 20 + 'px' }">
+              <el-image
+                v-if="scope.row.categoryImage"
+                :src="scope.row.categoryImage"
+                style="width: 32px; height: 32px; margin-right: 8px; border-radius: 4px;"
+                :preview-src-list="[scope.row.categoryImage]"
+              />
+              <span>{{ scope.row.categoryName }}</span>
+              <el-tag v-if="scope.row.level === 1" size="small" type="success" style="margin-left: 8px;">一级</el-tag>
+              <el-tag v-else-if="scope.row.level === 2" size="small" type="warning" style="margin-left: 8px;">二级</el-tag>
+              <el-tag v-else size="small" type="info" style="margin-left: 8px;">三级</el-tag>
+            </span>
+          </div>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" align="center" prop="createTime" width="200">
+      <el-table-column prop="orderNum" label="显示顺序" width="100" align="center">
+        <template #default="scope">
+          <el-input
+            v-model.number="scope.row.orderNum"
+            type="number"
+            size="small"
+            style="width: 70px"
+            @change="handleOrderChange(scope.row)"
+          />
+        </template>
+      </el-table-column>
+      <el-table-column prop="visible" label="显示状态" width="100" align="center">
+        <template #default="scope">
+          <el-switch
+            v-model="scope.row.visible"
+            active-value="0"
+            inactive-value="1"
+            @change="handleVisibleChange(scope.row)"
+          />
+        </template>
+      </el-table-column>
+      <el-table-column prop="goodsCount" label="商品数量" width="100" align="center">
+        <template #default="scope">
+          <el-badge :value="scope.row.goodsCount" :max="99" type="primary"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="创建时间" align="center" prop="createTime" width="160">
         <template #default="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="220" fixed="right">
         <template #default="scope">
-          <el-button
-            link
-            :icon="Edit"
-            @click="handleUpdate(scope.row)"
-            v-hasPermi="['tile:category:edit']"
-          >修改</el-button>
-          <el-button
-            link
-            :icon="Delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['tile:category:remove']"
-          >删除</el-button>
+          <div class="operation-buttons">
+            <el-button
+              link
+              type="primary"
+              :icon="Plus"
+              @click="handleAdd(scope.row)"
+              v-hasPermi="['tile:category:add']"
+            >新增</el-button>
+            <el-divider direction="vertical" />
+            <el-button
+              link
+              type="primary"
+              :icon="Edit"
+              @click="handleUpdate(scope.row)"
+              v-hasPermi="['tile:category:edit']"
+            >修改</el-button>
+            <el-divider direction="vertical" />
+            <el-button
+              link
+              type="primary"
+              :icon="Delete"
+              @click="handleDelete(scope.row)"
+              v-hasPermi="['tile:category:remove']"
+            >删除</el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -393,15 +444,125 @@ function cancel() {
   reset()
 }
 
+// 处理显示状态变化
+const handleVisibleChange = (row) => {
+  let text = row.visible === "0" ? "显示" : "隐藏";
+  updateCategory(row).then(response => {
+    ElMessage({
+      message: text + '成功',
+      type: 'success'
+    });
+  });
+}
+
+// 处理排序变化
+const handleOrderChange = (row) => {
+  updateCategory(row).then(response => {
+    ElMessage({
+      message: '排序更新成功',
+      type: 'success'
+    });
+    getList();
+  });
+}
+
 onMounted(() => {
   getList()
 })
 </script>
 
 <style scoped>
-.el-form-item label {
-  display: block;
-  margin-bottom: 8px;
-  color: var(--el-text-color-regular);
+.search-form {
+  padding: 16px 0;
+  margin-bottom: 10px;
+}
+
+.mb8 {
+  margin: 16px 0;
+}
+
+:deep(.el-form-item__label) {
+  color: #606266;
+  font-weight: 500;
+}
+
+:deep(.el-button) {
+  padding: 9px 15px;
+  margin-right: 8px;
+}
+
+:deep(.el-select) {
+  width: 240px;
+}
+
+:deep(.el-input__wrapper) {
+  box-shadow: 0 0 0 1px #dcdfe6 inset;
+}
+
+:deep(.el-input__wrapper:hover) {
+  box-shadow: 0 0 0 1px #c0c4cc inset;
+}
+
+:deep(.el-input__wrapper.is-focus) {
+  box-shadow: 0 0 0 1px #409eff inset;
+}
+
+:deep(.el-table) {
+  --el-table-header-bg-color: #f5f7fa;
+}
+
+:deep(.el-table__row) {
+  height: 50px;
+}
+
+:deep(.el-input-number) {
+  .el-input-number__decrease,
+  .el-input-number__increase {
+    display: none;
+  }
+}
+
+:deep(.el-table .el-table__cell) {
+  padding: 8px 0;
+}
+
+:deep(.el-table__indent) {
+  padding-left: 0 !important;
+}
+
+:deep(.el-table__expand-icon) {
+  transform: rotate(0deg);
+  margin-right: 8px;
+  float: left;
+  position: relative;
+  top: 1px;
+}
+
+:deep(.el-table__expand-icon--expanded) {
+  transform: rotate(90deg);
+}
+
+:deep(.el-table__expand-icon > .el-icon) {
+  font-size: 14px;
+  color: #909399;
+}
+
+:deep(.el-table__row .el-table__cell:first-child) {
+  padding-left: 10px;
+}
+
+.operation-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:deep(.operation-buttons .el-button) {
+  margin: 0 4px;
+}
+
+:deep(.operation-buttons .el-divider) {
+  margin: 0;
+  height: 1em;
 }
 </style>
