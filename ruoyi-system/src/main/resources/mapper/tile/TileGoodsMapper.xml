@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.tile.mapper.TileGoodsMapper">
+    
+    <resultMap type="TileGoods" id="TileGoodsResult">
+        <result property="goodsId"       column="goods_id"       />
+        <result property="goodsCode"     column="goods_code"     />
+        <result property="goodsName"     column="goods_name"     />
+        <result property="categoryId"    column="category_id"    />
+        <result property="specId"        column="spec_id"        />
+        <result property="materialId"    column="material_id"    />
+        <result property="surfaceId"     column="surface_id"     />
+        <result property="usageId"       column="usage_id"       />
+        <result property="patternId"     column="pattern_id"     />
+        <result property="goodsImage"    column="goods_image"    />
+        <result property="goodsImages"   column="goods_images"   />
+        <result property="goodsDesc"     column="goods_desc"     />
+        <result property="price"         column="price"          />
+        <result property="stock"         column="stock"          />
+        <result property="sales"         column="sales"          />
+        <result property="status"        column="status"         />
+        <result property="delFlag"       column="del_flag"       />
+        <result property="createBy"      column="create_by"      />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"      column="update_by"      />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"        column="remark"         />
+        <result property="categoryName"  column="category_name"  />
+        <result property="specName"      column="spec_name"      />
+        <result property="materialName"  column="material_name"  />
+        <result property="surfaceName"   column="surface_name"   />
+        <result property="usageName"     column="usage_name"     />
+        <result property="patternName"   column="pattern_name"   />
+    </resultMap>
+
+    <sql id="selectTileGoodsVo">
+        SELECT g.goods_id, g.goods_code, g.goods_name, g.category_id, g.spec_id, g.material_id, g.surface_id, g.usage_id, g.pattern_id,
+               g.goods_image, g.goods_images, g.goods_desc, g.price, g.stock, g.sales, g.status, g.del_flag, g.create_by, g.create_time,
+               g.update_by, g.update_time, g.remark,
+               c.category_name, s.spec_name, m.material_name, sf.surface_name, u.usage_name, p.pattern_name
+        FROM tile_goods g
+        LEFT JOIN tile_category c ON g.category_id = c.category_id
+        LEFT JOIN tile_spec s ON g.spec_id = s.spec_id
+        LEFT JOIN tile_material m ON g.material_id = m.material_id
+        LEFT JOIN tile_surface sf ON g.surface_id = sf.surface_id
+        LEFT JOIN tile_usage u ON g.usage_id = u.usage_id
+        LEFT JOIN tile_pattern p ON g.pattern_id = p.pattern_id
+    </sql>
+
+    <select id="selectTileGoodsList" parameterType="TileGoods" resultMap="TileGoodsResult">
+        <include refid="selectTileGoodsVo"/>
+        <where>
+            g.del_flag = '0'
+            <if test="goodsCode != null and goodsCode != ''">
+                AND g.goods_code like concat('%', #{goodsCode}, '%')
+            </if>
+            <if test="goodsName != null and goodsName != ''">
+                AND g.goods_name like concat('%', #{goodsName}, '%')
+            </if>
+            <if test="categoryId != null">
+                AND g.category_id = #{categoryId}
+            </if>
+            <if test="specId != null">
+                AND g.spec_id = #{specId}
+            </if>
+            <if test="materialId != null">
+                AND g.material_id = #{materialId}
+            </if>
+            <if test="surfaceId != null">
+                AND g.surface_id = #{surfaceId}
+            </if>
+            <if test="usageId != null">
+                AND g.usage_id = #{usageId}
+            </if>
+            <if test="patternId != null">
+                AND g.pattern_id = #{patternId}
+            </if>
+            <if test="status != null and status != ''">
+                AND g.status = #{status}
+            </if>
+        </where>
+        ORDER BY g.create_time DESC
+    </select>
+    
+    <select id="selectTileGoodsById" parameterType="Long" resultMap="TileGoodsResult">
+        <include refid="selectTileGoodsVo"/>
+        where g.goods_id = #{goodsId} AND g.del_flag = '0'
+    </select>
+
+    <select id="checkGoodsCodeUnique" parameterType="String" resultMap="TileGoodsResult">
+        <include refid="selectTileGoodsVo"/>
+        where g.goods_code = #{goodsCode} AND g.del_flag = '0' limit 1
+    </select>
+        
+    <insert id="insertTileGoods" parameterType="TileGoods" useGeneratedKeys="true" keyProperty="goodsId">
+        insert into tile_goods
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="goodsCode != null">goods_code,</if>
+            <if test="goodsName != null">goods_name,</if>
+            <if test="categoryId != null">category_id,</if>
+            <if test="specId != null">spec_id,</if>
+            <if test="materialId != null">material_id,</if>
+            <if test="surfaceId != null">surface_id,</if>
+            <if test="usageId != null">usage_id,</if>
+            <if test="patternId != null">pattern_id,</if>
+            <if test="goodsImage != null">goods_image,</if>
+            <if test="goodsImages != null">goods_images,</if>
+            <if test="goodsDesc != null">goods_desc,</if>
+            <if test="price != null">price,</if>
+            <if test="stock != null">stock,</if>
+            <if test="sales != null">sales,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="goodsCode != null">#{goodsCode},</if>
+            <if test="goodsName != null">#{goodsName},</if>
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="specId != null">#{specId},</if>
+            <if test="materialId != null">#{materialId},</if>
+            <if test="surfaceId != null">#{surfaceId},</if>
+            <if test="usageId != null">#{usageId},</if>
+            <if test="patternId != null">#{patternId},</if>
+            <if test="goodsImage != null">#{goodsImage},</if>
+            <if test="goodsImages != null">#{goodsImages},</if>
+            <if test="goodsDesc != null">#{goodsDesc},</if>
+            <if test="price != null">#{price},</if>
+            <if test="stock != null">#{stock},</if>
+            <if test="sales != null">#{sales},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTileGoods" parameterType="TileGoods">
+        update tile_goods
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="goodsCode != null">goods_code = #{goodsCode},</if>
+            <if test="goodsName != null">goods_name = #{goodsName},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="specId != null">spec_id = #{specId},</if>
+            <if test="materialId != null">material_id = #{materialId},</if>
+            <if test="surfaceId != null">surface_id = #{surfaceId},</if>
+            <if test="usageId != null">usage_id = #{usageId},</if>
+            <if test="patternId != null">pattern_id = #{patternId},</if>
+            <if test="goodsImage != null">goods_image = #{goodsImage},</if>
+            <if test="goodsImages != null">goods_images = #{goodsImages},</if>
+            <if test="goodsDesc != null">goods_desc = #{goodsDesc},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="stock != null">stock = #{stock},</if>
+            <if test="sales != null">sales = #{sales},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where goods_id = #{goodsId}
+    </update>
+
+    <update id="updateTileGoodsStatus" parameterType="TileGoods">
+        update tile_goods
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where goods_id = #{goodsId}
+    </update>
+
+    <update id="updateTileGoodsStock">
+        update tile_goods set stock = #{stock}
+        where goods_id = #{goodsId}
+    </update>
+
+    <update id="updateTileGoodsSales">
+        update tile_goods set sales = #{sales}
+        where goods_id = #{goodsId}
+    </update>
+
+    <delete id="deleteTileGoodsById" parameterType="Long">
+        update tile_goods set del_flag = '2'
+        where goods_id = #{goodsId}
+    </delete>
+
+    <delete id="deleteTileGoodsByIds" parameterType="Long">
+        update tile_goods set del_flag = '2'
+        where goods_id in 
+        <foreach item="goodsId" collection="array" open="(" separator="," close=")">
+            #{goodsId}
+        </foreach>
+    </delete>
+
+</mapper>
