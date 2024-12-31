@@ -157,6 +157,38 @@ export const dynamicRoutes = [
         meta: { title: '修改生成配置', activeMenu: '/tool/gen' }
       }
     ]
+  },
+  {
+    path: '/tile',
+    component: Layout,
+    name: 'Tile',
+    meta: { title: '瓷砖配置', icon: 'tool' },
+    children: [
+      {
+        path: 'pattern',
+        component: () => import('@/views/tile/config/pattern/index.vue'),
+        name: 'Pattern',
+        meta: { title: '图案管理', icon: 'list' }
+      },
+      {
+        path: 'surface',
+        component: () => import('@/views/tile/config/surface/index.vue'),
+        name: 'Surface',
+        meta: { title: '表面处理管理', icon: 'list' }
+      },
+      {
+        path: 'material',
+        component: () => import('@/views/tile/config/material/index.vue'),
+        name: 'Material',
+        meta: { title: '材质管理', icon: 'list' }
+      },
+      {
+        path: 'usage',
+        component: () => import('@/views/tile/config/usage/index.vue'),
+        name: 'Usage',
+        meta: { title: '用途管理', icon: 'list' }
+      }
+    ]
   }
 ]
 
