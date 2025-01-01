@@ -45,3 +45,6 @@ nbdist/
 !*/build/*.java
 !*/build/*.html
 !*/build/*.xml
+
+# 上传文件路径
+ruoyi-admin/D:/ruoyi/uploadPath/
