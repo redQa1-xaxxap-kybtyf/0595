@@ -3,16 +3,15 @@ package com.ruoyi.system.tile.service.impl;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.common.constant.UserConstants;
-import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.tile.mapper.TilePatternMapper;
 import com.ruoyi.system.tile.domain.TilePattern;
 import com.ruoyi.system.tile.service.ITilePatternService;
 
 /**
- * 图案管理 服务层实现
+ * 花型Service业务层处理
  * 
  * @author ruoyi
+ * @date 2024-01-01
  */
 @Service
 public class TilePatternServiceImpl implements ITilePatternService
@@ -21,10 +20,10 @@ public class TilePatternServiceImpl implements ITilePatternService
     private TilePatternMapper tilePatternMapper;
 
     /**
-     * 查询图案列表
+     * 查询花型列表
      * 
-     * @param pattern 图案信息
-     * @return 图案集合
+     * @param pattern 花型信息
+     * @return 花型集合
      */
     @Override
     public List<TilePattern> selectTilePatternList(TilePattern pattern)
@@ -33,10 +32,10 @@ public class TilePatternServiceImpl implements ITilePatternService
     }
 
     /**
-     * 通过图案ID查询图案
+     * 通过花型ID查询花型
      * 
-     * @param patternId 图案ID
-     * @return 图案信息
+     * @param patternId 花型ID
+     * @return 花型信息
      */
     @Override
     public TilePattern selectTilePatternById(Long patternId)
@@ -45,9 +44,9 @@ public class TilePatternServiceImpl implements ITilePatternService
     }
 
     /**
-     * 校验图案名称是否唯一
+     * 校验花型名称是否唯一
      * 
-     * @param patternName 图案名称
+     * @param patternName 花型名称
      * @return 结果
      */
     @Override
@@ -57,9 +56,9 @@ public class TilePatternServiceImpl implements ITilePatternService
     }
 
     /**
-     * 新增图案信息
+     * 新增花型信息
      * 
-     * @param pattern 图案信息
+     * @param pattern 花型信息
      * @return 结果
      */
     @Override
@@ -69,9 +68,9 @@ public class TilePatternServiceImpl implements ITilePatternService
     }
 
     /**
-     * 修改图案信息
+     * 修改花型信息
      * 
-     * @param pattern 图案信息
+     * @param pattern 花型信息
      * @return 结果
      */
     @Override
@@ -81,9 +80,9 @@ public class TilePatternServiceImpl implements ITilePatternService
     }
 
     /**
-     * 删除图案信息
+     * 删除花型信息
      * 
-     * @param patternId 图案ID
+     * @param patternId 花型ID
      * @return 结果
      */
     @Override
@@ -93,9 +92,9 @@ public class TilePatternServiceImpl implements ITilePatternService
     }
 
     /**
-     * 批量删除图案信息
+     * 批量删除花型信息
      * 
-     * @param patternIds 需要删除的图案ID
+     * @param patternIds 需要删除的花型ID
      * @return 结果
      */
     @Override
