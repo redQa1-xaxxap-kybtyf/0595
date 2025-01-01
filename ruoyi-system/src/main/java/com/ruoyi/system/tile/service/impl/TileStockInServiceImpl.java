@@ -72,8 +72,8 @@ public class TileStockInServiceImpl implements ITileStockInService
      * @param tileStockIn 入库单
      * @return 结果
      */
-    @Transactional
     @Override
+    @Transactional
     public int insertTileStockIn(TileStockIn tileStockIn)
     {
         tileStockIn.setCreateTime(DateUtils.getNowDate());
@@ -84,15 +84,18 @@ public class TileStockInServiceImpl implements ITileStockInService
         // 设置初始状态为待入库
         tileStockIn.setStatus("1");
         int rows = tileStockInMapper.insertTileStockIn(tileStockIn);
-        // 新增入库单明细
-        if (StringUtils.isNotNull(tileStockIn.getDetails()))
+        if (rows > 0)
         {
-            List<TileStockInDetail> details = tileStockIn.getDetails();
-            for (TileStockInDetail detail : details)
+            // 新增入库单明细
+            if (StringUtils.isNotNull(tileStockIn.getDetails()))
             {
-                detail.setInId(tileStockIn.getInId());
+                List<TileStockInDetail> details = tileStockIn.getDetails();
+                for (TileStockInDetail detail : details)
+                {
+                    detail.setInId(tileStockIn.getInId());
+                }
+                tileStockInDetailService.insertTileStockInDetails(details);
             }
-            tileStockInDetailService.insertTileStockInDetails(details);
         }
         return rows;
     }
@@ -179,7 +182,7 @@ public class TileStockInServiceImpl implements ITileStockInService
         List<TileStockInDetail> details = stockIn.getDetails();
         for (TileStockInDetail detail : details)
         {
-            tileStockService.addStock(detail.getGoodsId(), stockIn.getWarehouseId(), detail.getQuantity());
+            tileStockService.addStock(detail.getGoodsId(), stockIn.getWarehouseId(), Long.valueOf(detail.getQuantity()));
             
             // 添加库存记录
             TileStockRecord record = new TileStockRecord();

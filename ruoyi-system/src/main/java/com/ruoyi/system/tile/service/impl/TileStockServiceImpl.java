@@ -100,14 +100,15 @@ public class TileStockServiceImpl implements ITileStockService
      * @return 结果
      */
     @Override
-    public int addStock(Long goodsId, Long warehouseId, Integer quantity)
+    public int addStock(Long goodsId, Long warehouseId, Long quantity)
     {
-        // 查询是否存在库存记录
         TileStock stock = new TileStock();
         stock.setGoodsId(goodsId);
         stock.setWarehouseId(warehouseId);
+        stock.setStatus("0");
+
         List<TileStock> stocks = tileStockMapper.selectTileStockList(stock);
-        
+
         if (stocks != null && !stocks.isEmpty())
         {
             // 存在则更新
@@ -132,22 +133,30 @@ public class TileStockServiceImpl implements ITileStockService
      * @return 结果
      */
     @Override
-    public int subtractStock(Long goodsId, Long warehouseId, Integer quantity)
+    public int subtractStock(Long goodsId, Long warehouseId, Long quantity)
     {
-        // 查询库存记录
-        TileStock stock = selectTileStockByGoodsIdAndWarehouseId(goodsId, warehouseId);
-        if (stock == null)
+        TileStock stock = new TileStock();
+        stock.setGoodsId(goodsId);
+        stock.setWarehouseId(warehouseId);
+        stock.setStatus("0");
+
+        List<TileStock> stocks = tileStockMapper.selectTileStockList(stock);
+
+        if (stocks != null && !stocks.isEmpty())
         {
-            throw new RuntimeException("库存记录不存在");
+            // 存在则更新
+            TileStock existStock = stocks.get(0);
+            if (existStock.getQuantity() < quantity)
+            {
+                throw new RuntimeException("库存不足");
+            }
+            existStock.setQuantity(existStock.getQuantity() - quantity);
+            return tileStockMapper.updateTileStock(existStock);
         }
-        if (stock.getQuantity() < quantity)
+        else
         {
-            throw new RuntimeException("库存不足");
+            throw new RuntimeException("库存不存在");
         }
-        // 更新库存
-        stock.setQuantity(stock.getQuantity() - quantity);
-        stock.setUpdateTime(DateUtils.getNowDate());
-        return updateTileStock(stock);
     }
 
     /**

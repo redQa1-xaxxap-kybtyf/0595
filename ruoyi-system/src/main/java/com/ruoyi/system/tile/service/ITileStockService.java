@@ -66,7 +66,7 @@ public interface ITileStockService
      * @param quantity 增加数量
      * @return 结果
      */
-    public int addStock(Long goodsId, Long warehouseId, Integer quantity);
+    public int addStock(Long goodsId, Long warehouseId, Long quantity);
 
     /**
      * 减少库存
@@ -76,5 +76,5 @@ public interface ITileStockService
      * @param quantity 数量
      * @return 结果
      */
-    public int subtractStock(Long goodsId, Long warehouseId, Integer quantity);
+    public int subtractStock(Long goodsId, Long warehouseId, Long quantity);
 }

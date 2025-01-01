@@ -176,14 +176,14 @@ public class TileStockOutServiceImpl implements ITileStockOutService
         List<TileStockOutDetail> details = stockOut.getDetails();
         for (TileStockOutDetail detail : details)
         {
-            tileStockService.subtractStock(detail.getGoodsId(), stockOut.getWarehouseId(), detail.getQuantity());
+            tileStockService.subtractStock(detail.getGoodsId(), stockOut.getWarehouseId(), Long.valueOf(detail.getQuantity()));
             
             // 添加库存记录
             TileStockRecord record = new TileStockRecord();
             record.setOperType("2"); // 出库
             record.setGoodsId(detail.getGoodsId());
             record.setWarehouseId(stockOut.getWarehouseId());
-            record.setQuantity(detail.getQuantity());
+            record.setQuantity(Long.valueOf(detail.getQuantity()));
             record.setSourceId(stockOut.getOutId());
             record.setSourceType("2"); // 出库单
             record.setSourceCode(stockOut.getOutCode());
