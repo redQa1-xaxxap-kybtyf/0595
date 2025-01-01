@@ -3,16 +3,15 @@ package com.ruoyi.system.tile.service.impl;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.common.constant.UserConstants;
-import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.tile.mapper.TileMaterialMapper;
 import com.ruoyi.system.tile.domain.TileMaterial;
 import com.ruoyi.system.tile.service.ITileMaterialService;
 
 /**
- * 材质管理 服务层实现
+ * 材质Service业务层处理
  * 
  * @author ruoyi
+ * @date 2024-01-01
  */
 @Service
 public class TileMaterialServiceImpl implements ITileMaterialService
