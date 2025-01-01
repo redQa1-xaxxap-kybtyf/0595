@@ -28,6 +28,7 @@
               :show-all-levels="true"
               placeholder="请选择商品分类"
               clearable
+              style="width: 100%"
             />
           </el-form-item>
         </el-col>
