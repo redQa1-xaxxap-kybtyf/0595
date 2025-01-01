@@ -209,8 +209,11 @@ const getList = async () => {
 /** 查询分类树 */
 const getCategoryTree = async () => {
   try {
-    const res = await listCategory()
-    categoryOptions.value = res.data
+    const res = await listCategory({
+      pageSize: 999,
+      status: '0'  // 只获取正常状态的分类
+    })
+    categoryOptions.value = res.rows
   } catch (error) {
     console.error('获取分类树失败:', error)
   }
