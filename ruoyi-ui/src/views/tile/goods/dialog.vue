@@ -8,7 +8,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="商品名称" prop="goodsName">
+          <el-form-item label="商品名称">
             <el-input v-model="form.goodsName" placeholder="请输入商品名称" />
           </el-form-item>
         </el-col>
@@ -33,7 +33,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="规格尺寸" prop="specId">
+          <el-form-item label="规格尺寸">
             <el-select v-model="form.specId" placeholder="请选择规格尺寸">
               <el-option
                 v-for="item in specOptions"
@@ -45,7 +45,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="材质" prop="materialId">
+          <el-form-item label="材质">
             <el-select v-model="form.materialId" placeholder="请选择材质">
               <el-option
                 v-for="item in materialOptions"
@@ -57,7 +57,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="表面处理" prop="surfaceId">
+          <el-form-item label="表面处理">
             <el-select v-model="form.surfaceId" placeholder="请选择表面处理">
               <el-option
                 v-for="item in surfaceOptions"
@@ -69,7 +69,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="用途" prop="usageId">
+          <el-form-item label="用途">
             <el-select v-model="form.usageId" placeholder="请选择用途">
               <el-option
                 v-for="item in usageOptions"
@@ -81,7 +81,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="图案" prop="patternId">
+          <el-form-item label="图案">
             <el-select v-model="form.patternId" placeholder="请选择图案">
               <el-option
                 v-for="item in patternOptions"
@@ -93,7 +93,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="状态" prop="status">
+          <el-form-item label="状态">
             <el-radio-group v-model="form.status">
               <el-radio :value="'0'">上架</el-radio>
               <el-radio :value="'1'">下架</el-radio>

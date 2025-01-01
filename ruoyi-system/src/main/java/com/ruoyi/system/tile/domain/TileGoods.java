@@ -48,6 +48,7 @@ public class TileGoods extends BaseEntity
     private Long patternId;
 
     /** 商品主图 */
+    @NotBlank(message = "商品主图不能为空")
     private String goodsImage;
 
     /** 商品图片集 */
