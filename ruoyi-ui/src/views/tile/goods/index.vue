@@ -242,17 +242,32 @@ const getCategoryTree = async () => {
 const getAllOptions = async () => {
   try {
     const [specRes, materialRes, surfaceRes, usageRes, patternRes] = await Promise.all([
-      listSpec(),
-      listMaterial(),
-      listSurface(),
-      listUsage(),
-      listPattern()
+      listSpec({
+        pageSize: 999,
+        status: '0'  // 只获取正常状态的规格
+      }),
+      listMaterial({
+        pageSize: 999,
+        status: '0'  // 只获取正常状态的材质
+      }),
+      listSurface({
+        pageSize: 999,
+        status: '0'  // 只获取正常状态的表面处理
+      }),
+      listUsage({
+        pageSize: 999,
+        status: '0'  // 只获取正常状态的用途
+      }),
+      listPattern({
+        pageSize: 999,
+        status: '0'  // 只获取正常状态的图案
+      })
     ])
-    specOptions.value = specRes.data
-    materialOptions.value = materialRes.data
-    surfaceOptions.value = surfaceRes.data
-    usageOptions.value = usageRes.data
-    patternOptions.value = patternRes.data
+    specOptions.value = specRes.rows
+    materialOptions.value = materialRes.rows
+    surfaceOptions.value = surfaceRes.rows
+    usageOptions.value = usageRes.rows
+    patternOptions.value = patternRes.rows
   } catch (error) {
     console.error('获取选项数据失败:', error)
   }
