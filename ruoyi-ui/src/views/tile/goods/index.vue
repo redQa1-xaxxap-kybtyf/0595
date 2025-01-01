@@ -29,11 +29,14 @@
           v-model="queryParams.categoryId"
           :options="categoryOptions"
           :props="{ 
-            checkStrictly: true,
+            checkStrictly: false,
             value: 'categoryId',
             label: 'categoryName',
-            children: 'children'
+            children: 'children',
+            expandTrigger: 'hover',
+            emitPath: false
           }"
+          :show-all-levels="true"
           placeholder="请选择商品分类"
           clearable
         />
@@ -213,7 +216,23 @@ const getCategoryTree = async () => {
       pageSize: 999,
       status: '0'  // 只获取正常状态的分类
     })
-    categoryOptions.value = res.rows
+    
+    // 将扁平的分类列表转换为树形结构
+    const buildTree = (items, parentId = 0) => {
+      const result = []
+      for (const item of items) {
+        if (item.parentId === parentId) {
+          const children = buildTree(items, item.categoryId)
+          if (children.length) {
+            item.children = children
+          }
+          result.push(item)
+        }
+      }
+      return result
+    }
+    
+    categoryOptions.value = buildTree(res.rows)
   } catch (error) {
     console.error('获取分类树失败:', error)
   }

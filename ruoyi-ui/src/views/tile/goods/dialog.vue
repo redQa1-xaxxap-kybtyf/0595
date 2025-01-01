@@ -14,14 +14,21 @@
         </el-col>
         <el-col :span="12">
           <el-form-item label="商品分类" prop="categoryId">
-            <el-select v-model="form.categoryId" placeholder="请选择商品分类">
-              <el-option
-                v-for="item in categoryOptions"
-                :key="item.categoryId"
-                :label="item.categoryName"
-                :value="item.categoryId"
-              />
-            </el-select>
+            <el-cascader
+              v-model="form.categoryId"
+              :options="categoryOptions"
+              :props="{ 
+                checkStrictly: true,
+                value: 'categoryId',
+                label: 'categoryName',
+                children: 'children',
+                expandTrigger: 'hover',
+                emitPath: false
+              }"
+              :show-all-levels="true"
+              placeholder="请选择商品分类"
+              clearable
+            />
           </el-form-item>
         </el-col>
         <el-col :span="12">
