@@ -1,6 +1,5 @@
 package com.ruoyi.system.tile.domain;
 
-import java.math.BigDecimal;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -58,12 +57,6 @@ public class TileGoods extends BaseEntity
     /** 商品描述 */
     @Size(min = 0, max = 500, message = "商品描述长度不能超过500个字符")
     private String goodsDesc;
-
-    /** 商品价格 */
-    private BigDecimal price;
-
-    /** 库存数量 */
-    private Integer stock;
 
     /** 销量 */
     private Integer sales;
@@ -212,26 +205,6 @@ public class TileGoods extends BaseEntity
         this.goodsDesc = goodsDesc;
     }
 
-    public BigDecimal getPrice()
-    {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price)
-    {
-        this.price = price;
-    }
-
-    public Integer getStock()
-    {
-        return stock;
-    }
-
-    public void setStock(Integer stock)
-    {
-        this.stock = stock;
-    }
-
     public Integer getSales()
     {
         return sales;
@@ -325,29 +298,27 @@ public class TileGoods extends BaseEntity
     @Override
     public String toString()
     {
-        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
-                .append("goodsId", getGoodsId())
-                .append("goodsCode", getGoodsCode())
-                .append("goodsName", getGoodsName())
-                .append("categoryId", getCategoryId())
-                .append("specId", getSpecId())
-                .append("materialId", getMaterialId())
-                .append("surfaceId", getSurfaceId())
-                .append("usageId", getUsageId())
-                .append("patternId", getPatternId())
-                .append("goodsImage", getGoodsImage())
-                .append("goodsImages", getGoodsImages())
-                .append("goodsDesc", getGoodsDesc())
-                .append("price", getPrice())
-                .append("stock", getStock())
-                .append("sales", getSales())
-                .append("status", getStatus())
-                .append("delFlag", getDelFlag())
-                .append("createBy", getCreateBy())
-                .append("createTime", getCreateTime())
-                .append("updateBy", getUpdateBy())
-                .append("updateTime", getUpdateTime())
-                .append("remark", getRemark())
-                .toString();
+        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
+            .append("goodsId", getGoodsId())
+            .append("goodsCode", getGoodsCode())
+            .append("goodsName", getGoodsName())
+            .append("categoryId", getCategoryId())
+            .append("specId", getSpecId())
+            .append("materialId", getMaterialId())
+            .append("surfaceId", getSurfaceId())
+            .append("usageId", getUsageId())
+            .append("patternId", getPatternId())
+            .append("goodsImage", getGoodsImage())
+            .append("goodsImages", getGoodsImages())
+            .append("goodsDesc", getGoodsDesc())
+            .append("sales", getSales())
+            .append("status", getStatus())
+            .append("delFlag", getDelFlag())
+            .append("createBy", getCreateBy())
+            .append("createTime", getCreateTime())
+            .append("updateBy", getUpdateBy())
+            .append("updateTime", getUpdateTime())
+            .append("remark", getRemark())
+            .toString();
     }
 }

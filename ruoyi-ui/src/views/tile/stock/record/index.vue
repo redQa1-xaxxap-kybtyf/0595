@@ -12,10 +12,24 @@
         </el-select>
       </el-form-item>
       <el-form-item label="商品" prop="goodsId">
-        <goods-select v-model="queryParams.goodsId" />
+        <el-select v-model="queryParams.goodsId" placeholder="商品" clearable style="width: 200px">
+          <el-option
+            v-for="item in goodsOptions"
+            :key="item.goodsId"
+            :label="item.goodsName"
+            :value="item.goodsId"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item label="仓库" prop="warehouseId">
-        <warehouse-select v-model="queryParams.warehouseId" />
+        <el-select v-model="queryParams.warehouseId" placeholder="仓库" clearable style="width: 200px">
+          <el-option
+            v-for="item in warehouseOptions"
+            :key="item.warehouseId"
+            :label="item.warehouseName"
+            :value="item.warehouseId"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item label="单据类型" prop="sourceType">
         <el-select v-model="queryParams.sourceType" placeholder="单据类型" clearable style="width: 200px">
@@ -67,7 +81,7 @@
           type="danger"
           plain
           icon="Delete"
-          :disabled="multiple"
+          :disabled="single"
           @click="handleDelete"
           v-hasPermi="['tile:stock:record:remove']"
         >删除</el-button>
@@ -84,11 +98,11 @@
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="recordList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="stockRecordList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="操作类型" align="center" prop="operType">
         <template #default="scope">
-          <dict-tag :options="tile_stock_oper_type" :value="scope.row.operType"/>
+          {{ getDictLabel(tile_stock_oper_type, scope.row.operType) }}
         </template>
       </el-table-column>
       <el-table-column label="商品" align="center" prop="goodsName" />
@@ -96,7 +110,7 @@
       <el-table-column label="数量" align="center" prop="quantity" />
       <el-table-column label="单据类型" align="center" prop="sourceType">
         <template #default="scope">
-          <dict-tag :options="tile_stock_source_type" :value="scope.row.sourceType"/>
+          {{ getDictLabel(tile_stock_source_type, scope.row.sourceType) }}
         </template>
       </el-table-column>
       <el-table-column label="单据编号" align="center" prop="sourceCode" />
@@ -130,16 +144,23 @@
 </template>
 
 <script setup name="StockRecord">
-import { listStockRecord, delStockRecord, exportStockRecord, cleanStockRecord } from "@/api/tile/stock";
-import { ref, reactive, onMounted } from 'vue';
+import { listStockRecord, delStockRecord, cleanStockRecord, exportStockRecord } from "@/api/tile/stock";
+import { listWarehouse } from "@/api/tile/warehouse";
+import { listGoods } from "@/api/tile/goods";
+import { getCurrentInstance, ref, reactive, onMounted } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { useDict } from '@/utils/dict'
+import { parseTime, addDateRange } from '@/utils/ruoyi'
 
 const { proxy } = getCurrentInstance();
+const { tile_stock_oper_type, tile_stock_source_type } = useDict('tile_stock_oper_type', 'tile_stock_source_type')
 
 // 遮罩层
 const loading = ref(false);
 // 选中数组
 const ids = ref([]);
+// 非单个禁用
+const single = ref(true);
 // 非多个禁用
 const multiple = ref(true);
 // 显示搜索条件
@@ -147,29 +168,58 @@ const showSearch = ref(true);
 // 总条数
 const total = ref(0);
 // 库存记录表格数据
-const recordList = ref([]);
+const stockRecordList = ref([]);
+// 弹出层标题
+const title = ref("");
+// 是否显示弹出层
+const open = ref(false);
 // 日期范围
 const dateRange = ref([]);
+// 仓库选项列表
+const warehouseOptions = ref([]);
+// 商品选项列表
+const goodsOptions = ref([]);
 
 // 查询参数
 const queryParams = ref({
   pageNum: 1,
   pageSize: 10,
-  operType: undefined,
-  goodsId: undefined,
-  warehouseId: undefined,
-  sourceType: undefined,
-  sourceCode: undefined
+  warehouseId: null,
+  goodsId: null,
+  operType: null,
+  sourceType: null,
+  sourceCode: null
 });
 
 /** 查询库存记录列表 */
 function getList() {
   loading.value = true;
-  listStockRecord(proxy.addDateRange(queryParams.value, dateRange.value)).then(response => {
-    recordList.value = response.rows;
+  listStockRecord(addDateRange(queryParams.value, dateRange.value)).then(response => {
+    stockRecordList.value = response.rows;
     total.value = response.total;
     loading.value = false;
   });
+}
+
+/** 查询仓库列表 */
+function getWarehouseList() {
+  listWarehouse().then(response => {
+    warehouseOptions.value = response.rows;
+  });
+}
+
+/** 查询商品列表 */
+function getGoodsList() {
+  listGoods().then(response => {
+    goodsOptions.value = response.rows;
+  });
+}
+
+// 多选框选中数据
+function handleSelectionChange(selection) {
+  ids.value = selection.map(item => item.recordId);
+  single.value = selection.length !== 1;
+  multiple.value = !selection.length;
 }
 
 /** 搜索按钮操作 */
@@ -182,53 +232,63 @@ function handleQuery() {
 function resetQuery() {
   dateRange.value = [];
   proxy.resetForm("queryRef");
+  queryParams.value.pageNum = 1;
   handleQuery();
-}
-
-/** 多选框选中数据 */
-function handleSelectionChange(selection) {
-  ids.value = selection.map(item => item.recordId);
-  multiple.value = !selection.length;
 }
 
 /** 删除按钮操作 */
 function handleDelete(row) {
   const recordIds = row.recordId || ids.value;
-  ElMessageBox.confirm('是否确认删除库存记录？', "警告", {
+  ElMessageBox.confirm('是否确认删除库存记录编号为"' + recordIds + '"的数据项?', "警告", {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning"
+  }).then(function() {
+    return delStockRecord(recordIds);
   }).then(() => {
-    delStockRecord(recordIds).then(() => {
-      getList();
-      ElMessage.success("删除成功");
-    });
-  });
+    getList();
+    ElMessage.success("删除成功");
+  }).catch(() => {});
 }
 
 /** 清空按钮操作 */
 function handleClean() {
-  ElMessageBox.confirm('是否确认清空所有库存记录？', "警告", {
+  ElMessageBox.confirm('是否确认清空所有库存记录?', "警告", {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning"
+  }).then(function() {
+    return cleanStockRecord();
   }).then(() => {
-    cleanStockRecord().then(() => {
-      getList();
-      ElMessage.success("清空成功");
-    });
-  });
+    getList();
+    ElMessage.success("清空成功");
+  }).catch(() => {});
 }
 
 /** 导出按钮操作 */
 function handleExport() {
-  proxy.download('tile/stock/record/export', {
-    ...queryParams.value,
-    ...proxy.addDateRange(queryParams.value, dateRange.value)
-  }, `库存记录_${new Date().getTime()}.xlsx`);
+  const queryParams = proxy.addDateRange(queryParams.value, dateRange.value);
+  ElMessageBox.confirm('是否确认导出所有库存记录数据项?', "警告", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning"
+  }).then(function() {
+    return exportStockRecord(queryParams);
+  }).then(response => {
+    proxy.download(response.msg);
+  }).catch(() => {});
+}
+
+/** 获取字典数据 */
+function getDictLabel(dicts, value) {
+  if (!dicts || !value) return '';
+  const dict = dicts.find(dict => dict.value === value);
+  return dict ? dict.label : '';
 }
 
 onMounted(() => {
+  getWarehouseList();
+  getGoodsList();
   getList();
 });
 </script>

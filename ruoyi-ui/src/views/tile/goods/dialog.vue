@@ -89,11 +89,6 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="价格" prop="price">
-            <el-input-number v-model="form.price" :precision="2" :step="0.1" :min="0" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
           <el-form-item label="库存" prop="stock">
             <el-input-number v-model="form.stock" :min="0" />
           </el-form-item>
@@ -196,13 +191,11 @@ const form = ref({
   surfaceId: undefined,
   usageId: undefined,
   patternId: undefined,
-  price: 0,
   stock: 0,
-  sales: 0,
-  status: "0"
+  status: '0'
 })
 
-const rules = ref({
+const rules = {
   goodsCode: [
     { required: true, message: '商品编号不能为空', trigger: 'blur' }
   ],
@@ -210,25 +203,22 @@ const rules = ref({
     { required: true, message: '商品名称不能为空', trigger: 'blur' }
   ],
   categoryId: [
-    { required: true, message: '商品分类不能为空', trigger: 'change' }
+    { required: true, message: '请选择商品分类', trigger: 'change' }
   ],
   specId: [
-    { required: true, message: '规格尺寸不能为空', trigger: 'change' }
+    { required: true, message: '请选择规格尺寸', trigger: 'change' }
   ],
   materialId: [
-    { required: true, message: '材质不能为空', trigger: 'change' }
+    { required: true, message: '请选择材质', trigger: 'change' }
   ],
   surfaceId: [
-    { required: true, message: '表面处理不能为空', trigger: 'change' }
+    { required: true, message: '请选择表面处理', trigger: 'change' }
   ],
   usageId: [
-    { required: true, message: '用途不能为空', trigger: 'change' }
+    { required: true, message: '请选择用途', trigger: 'change' }
   ],
   patternId: [
-    { required: true, message: '图案不能为空', trigger: 'change' }
-  ],
-  price: [
-    { required: true, message: '价格不能为空', trigger: 'blur' }
+    { required: true, message: '请选择图案', trigger: 'change' }
   ],
   stock: [
     { required: true, message: '库存不能为空', trigger: 'blur' }
@@ -236,19 +226,19 @@ const rules = ref({
   goodsImage: [
     { required: true, message: '商品主图不能为空', trigger: 'change' }
   ]
-})
+}
 
-const handleUploadSuccess = (response) => {
+function handleUploadSuccess(response) {
   form.value.goodsImage = response.url
 }
 
-const beforeUpload = (file) => {
+function beforeUpload(file) {
   const isJPG = file.type === 'image/jpeg'
   const isPNG = file.type === 'image/png'
   const isLt2M = file.size / 1024 / 1024 < 2
 
   if (!isJPG && !isPNG) {
-    ElMessage.error('上传图片只能是 JPG 或 PNG 格式!')
+    ElMessage.error('上传图片只能是 JPG/PNG 格式!')
     return false
   }
   if (!isLt2M) {
@@ -258,20 +248,20 @@ const beforeUpload = (file) => {
   return true
 }
 
-const submitForm = () => {
-  formRef.value?.validate(async (valid) => {
+function submitForm() {
+  formRef.value?.validate((valid) => {
     if (valid) {
       emit('change', form.value)
     }
   })
 }
 
-const cancel = () => {
+function cancel() {
   reset()
   open.value = false
 }
 
-const reset = () => {
+function reset() {
   form.value = {
     goodsId: undefined,
     goodsCode: undefined,
@@ -283,12 +273,9 @@ const reset = () => {
     surfaceId: undefined,
     usageId: undefined,
     patternId: undefined,
-    price: 0,
     stock: 0,
-    sales: 0,
-    status: "0"
+    status: '0'
   }
-  formRef.value?.resetFields()
   emit('reset')
 }
 
@@ -299,27 +286,29 @@ defineExpose({
 </script>
 
 <style scoped>
-.avatar-uploader .avatar {
-  width: 178px;
-  height: 178px;
-  display: block;
-}
-.avatar-uploader .el-upload {
-  border: 1px dashed var(--el-border-color);
+.avatar-uploader {
+  border: 1px dashed #d9d9d9;
   border-radius: 6px;
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  transition: var(--el-transition-duration-fast);
+  width: 178px;
+  height: 178px;
 }
-.avatar-uploader .el-upload:hover {
-  border-color: var(--el-color-primary);
+.avatar-uploader:hover {
+  border-color: #409EFF;
 }
 .avatar-uploader-icon {
   font-size: 28px;
   color: #8c939d;
   width: 178px;
   height: 178px;
+  line-height: 178px;
   text-align: center;
+}
+.avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
 }
 </style>

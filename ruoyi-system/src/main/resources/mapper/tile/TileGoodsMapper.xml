@@ -17,8 +17,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="goodsImage"    column="goods_image"    />
         <result property="goodsImages"   column="goods_images"   />
         <result property="goodsDesc"     column="goods_desc"     />
-        <result property="price"         column="price"          />
-        <result property="stock"         column="stock"          />
         <result property="sales"         column="sales"          />
         <result property="status"        column="status"         />
         <result property="delFlag"       column="del_flag"       />
@@ -37,7 +35,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <sql id="selectTileGoodsVo">
         SELECT g.goods_id, g.goods_code, g.goods_name, g.category_id, g.spec_id, g.material_id, g.surface_id, g.usage_id, g.pattern_id,
-               g.goods_image, g.goods_images, g.goods_desc, g.price, g.stock, g.sales, g.status, g.del_flag, g.create_by, g.create_time,
+               g.goods_image, g.goods_images, g.goods_desc, g.sales, g.status, g.del_flag, g.create_by, g.create_time,
                g.update_by, g.update_time, g.remark,
                c.category_name, s.spec_name, m.material_name, sf.surface_name, u.usage_name, p.pattern_name
         FROM tile_goods g
@@ -108,8 +106,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="goodsImage != null">goods_image,</if>
             <if test="goodsImages != null">goods_images,</if>
             <if test="goodsDesc != null">goods_desc,</if>
-            <if test="price != null">price,</if>
-            <if test="stock != null">stock,</if>
             <if test="sales != null">sales,</if>
             <if test="status != null">status,</if>
             <if test="delFlag != null">del_flag,</if>
@@ -131,8 +127,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="goodsImage != null">#{goodsImage},</if>
             <if test="goodsImages != null">#{goodsImages},</if>
             <if test="goodsDesc != null">#{goodsDesc},</if>
-            <if test="price != null">#{price},</if>
-            <if test="stock != null">#{stock},</if>
             <if test="sales != null">#{sales},</if>
             <if test="status != null">#{status},</if>
             <if test="delFlag != null">#{delFlag},</if>
@@ -158,34 +152,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="goodsImage != null">goods_image = #{goodsImage},</if>
             <if test="goodsImages != null">goods_images = #{goodsImages},</if>
             <if test="goodsDesc != null">goods_desc = #{goodsDesc},</if>
-            <if test="price != null">price = #{price},</if>
-            <if test="stock != null">stock = #{stock},</if>
             <if test="sales != null">sales = #{sales},</if>
             <if test="status != null">status = #{status},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
             <if test="remark != null">remark = #{remark},</if>
         </trim>
-        where goods_id = #{goodsId}
-    </update>
-
-    <update id="updateTileGoodsStatus" parameterType="TileGoods">
-        update tile_goods
-        <trim prefix="SET" suffixOverrides=",">
-            <if test="status != null">status = #{status},</if>
-            <if test="updateBy != null">update_by = #{updateBy},</if>
-            <if test="updateTime != null">update_time = #{updateTime},</if>
-        </trim>
-        where goods_id = #{goodsId}
-    </update>
-
-    <update id="updateTileGoodsStock">
-        update tile_goods set stock = #{stock}
-        where goods_id = #{goodsId}
-    </update>
-
-    <update id="updateTileGoodsSales">
-        update tile_goods set sales = #{sales}
         where goods_id = #{goodsId}
     </update>
 
@@ -194,12 +167,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where goods_id = #{goodsId}
     </delete>
 
-    <delete id="deleteTileGoodsByIds" parameterType="Long">
-        update tile_goods set del_flag = '2'
-        where goods_id in 
+    <delete id="deleteTileGoodsByIds" parameterType="String">
+        update tile_goods set del_flag = '2' where goods_id in 
         <foreach item="goodsId" collection="array" open="(" separator="," close=")">
             #{goodsId}
         </foreach>
     </delete>
-
+    
 </mapper>

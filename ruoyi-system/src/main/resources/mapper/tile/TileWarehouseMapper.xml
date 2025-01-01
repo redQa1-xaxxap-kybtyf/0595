@@ -7,12 +7,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <resultMap type="com.ruoyi.system.tile.domain.TileWarehouse" id="TileWarehouseResult">
         <result property="warehouseId"    column="warehouse_id"    />
         <result property="warehouseName"  column="warehouse_name"  />
-        <result property="warehouseCode"  column="warehouse_code"  />
-        <result property="warehouseType"  column="warehouse_type"  />
+        <result property="locations"      column="locations"       />
         <result property="address"        column="address"         />
-        <result property="area"           column="area"           />
-        <result property="manager"        column="manager"        />
-        <result property="phone"          column="phone"          />
         <result property="status"         column="status"         />
         <result property="delFlag"        column="del_flag"       />
         <result property="createBy"       column="create_by"      />
@@ -23,7 +19,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectTileWarehouseVo">
-        select warehouse_id, warehouse_name, warehouse_code, warehouse_type, address, area, manager, phone, status, del_flag, create_by, create_time, update_by, update_time, remark 
+        select warehouse_id, warehouse_name, locations, address, status, del_flag, create_by, create_time, update_by, update_time, remark 
         from tile_warehouse
     </sql>
 
@@ -31,10 +27,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectTileWarehouseVo"/>
         <where>  
             <if test="warehouseName != null  and warehouseName != ''"> and warehouse_name like concat('%', #{warehouseName}, '%')</if>
-            <if test="warehouseCode != null  and warehouseCode != ''"> and warehouse_code = #{warehouseCode}</if>
-            <if test="warehouseType != null  and warehouseType != ''"> and warehouse_type = #{warehouseType}</if>
-            <if test="manager != null  and manager != ''"> and manager = #{manager}</if>
-            <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
+            <if test="locations != null  and locations != ''"> and locations like concat('%', #{locations}, '%')</if>
             <if test="status != null  and status != ''"> and status = #{status}</if>
             and del_flag = '0'
         </where>
@@ -49,12 +42,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         insert into tile_warehouse
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="warehouseName != null">warehouse_name,</if>
-            <if test="warehouseCode != null">warehouse_code,</if>
-            <if test="warehouseType != null">warehouse_type,</if>
+            <if test="locations != null">locations,</if>
             <if test="address != null">address,</if>
-            <if test="area != null">area,</if>
-            <if test="manager != null">manager,</if>
-            <if test="phone != null">phone,</if>
             <if test="status != null">status,</if>
             <if test="delFlag != null">del_flag,</if>
             <if test="createBy != null">create_by,</if>
@@ -65,12 +54,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="warehouseName != null">#{warehouseName},</if>
-            <if test="warehouseCode != null">#{warehouseCode},</if>
-            <if test="warehouseType != null">#{warehouseType},</if>
+            <if test="locations != null">#{locations},</if>
             <if test="address != null">#{address},</if>
-            <if test="area != null">#{area},</if>
-            <if test="manager != null">#{manager},</if>
-            <if test="phone != null">#{phone},</if>
             <if test="status != null">#{status},</if>
             <if test="delFlag != null">#{delFlag},</if>
             <if test="createBy != null">#{createBy},</if>
@@ -85,12 +70,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         update tile_warehouse
         <trim prefix="SET" suffixOverrides=",">
             <if test="warehouseName != null">warehouse_name = #{warehouseName},</if>
-            <if test="warehouseCode != null">warehouse_code = #{warehouseCode},</if>
-            <if test="warehouseType != null">warehouse_type = #{warehouseType},</if>
+            <if test="locations != null">locations = #{locations},</if>
             <if test="address != null">address = #{address},</if>
-            <if test="area != null">area = #{area},</if>
-            <if test="manager != null">manager = #{manager},</if>
-            <if test="phone != null">phone = #{phone},</if>
             <if test="status != null">status = #{status},</if>
             <if test="delFlag != null">del_flag = #{delFlag},</if>
             <if test="createBy != null">create_by = #{createBy},</if>

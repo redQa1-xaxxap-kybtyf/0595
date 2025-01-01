@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import com.ruoyi.system.tile.mapper.TileWarehouseMapper;
 import com.ruoyi.system.tile.domain.TileWarehouse;
 import com.ruoyi.system.tile.service.ITileWarehouseService;
+import com.ruoyi.common.utils.DateUtils;
 
 /**
  * 仓库Service业务层处理
@@ -52,6 +53,7 @@ public class TileWarehouseServiceImpl implements ITileWarehouseService
     @Override
     public int insertTileWarehouse(TileWarehouse tileWarehouse)
     {
+        tileWarehouse.setCreateTime(DateUtils.getNowDate());
         return tileWarehouseMapper.insertTileWarehouse(tileWarehouse);
     }
 
@@ -64,6 +66,7 @@ public class TileWarehouseServiceImpl implements ITileWarehouseService
     @Override
     public int updateTileWarehouse(TileWarehouse tileWarehouse)
     {
+        tileWarehouse.setUpdateTime(DateUtils.getNowDate());
         return tileWarehouseMapper.updateTileWarehouse(tileWarehouse);
     }
 

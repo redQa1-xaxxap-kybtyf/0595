@@ -10,7 +10,14 @@
         />
       </el-form-item>
       <el-form-item label="仓库" prop="warehouseId">
-        <warehouse-select v-model="queryParams.warehouseId" />
+        <el-select v-model="queryParams.warehouseId" placeholder="请选择仓库" clearable>
+          <el-option
+            v-for="item in warehouseOptions"
+            :key="item.warehouseId"
+            :label="item.warehouseName"
+            :value="item.warehouseId"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="入库单状态" clearable>
@@ -137,7 +144,14 @@
     <el-dialog :title="title" v-model="open" width="800px" append-to-body>
       <el-form ref="stockInRef" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="仓库" prop="warehouseId">
-          <warehouse-select v-model="form.warehouseId" />
+          <el-select v-model="form.warehouseId" placeholder="请选择仓库">
+            <el-option
+              v-for="item in warehouseOptions"
+              :key="item.warehouseId"
+              :label="item.warehouseName"
+              :value="item.warehouseId"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
@@ -154,7 +168,7 @@
             <template #default="scope">
               <el-select v-model="scope.row.goodsId" placeholder="请选择商品">
                 <el-option
-                  v-for="item in goodsList"
+                  v-for="item in goodsOptions"
                   :key="item.goodsId"
                   :label="item.goodsName"
                   :value="item.goodsId"
@@ -186,13 +200,13 @@
 
 <script setup name="TileStockIn">
 import { listStockIn, getStockIn, delStockIn, addStockIn, updateStockIn, submitStockIn, cancelStockIn } from "@/api/tile/stock";
+import { listWarehouse } from "@/api/tile/warehouse";
 import { listGoods } from "@/api/tile/goods";
 
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict("sys_normal_disable");
 
 const stockInList = ref([]);
-const goodsList = ref([]);
 const open = ref(false);
 const loading = ref(true);
 const showSearch = ref(true);
@@ -201,6 +215,9 @@ const single = ref(true);
 const multiple = ref(true);
 const total = ref(0);
 const title = ref("");
+const dateRange = ref([]);
+const warehouseOptions = ref([]);
+const goodsOptions = ref([]);
 
 const data = reactive({
   form: {
@@ -237,10 +254,17 @@ function getList() {
   });
 }
 
+/** 查询仓库列表 */
+function getWarehouseList() {
+  listWarehouse().then(response => {
+    warehouseOptions.value = response.rows;
+  });
+}
+
 /** 查询商品列表 */
 function getGoodsList() {
   listGoods().then(response => {
-    goodsList.value = response.rows;
+    goodsOptions.value = response.rows;
   });
 }
 
@@ -285,7 +309,6 @@ function handleSelectionChange(selection) {
 /** 新增按钮操作 */
 function handleAdd() {
   reset();
-  getGoodsList();
   open.value = true;
   title.value = "添加入库单";
 }
@@ -293,7 +316,6 @@ function handleAdd() {
 /** 修改按钮操作 */
 function handleUpdate(row) {
   reset();
-  getGoodsList();
   const inId = row.inId || ids.value[0];
   getStockIn(inId).then(response => {
     form.value = response.data;
@@ -380,5 +402,7 @@ function handleDetail(row) {
   proxy.$router.push({ path: '/tile/stock/in/detail', query: { inId: inId }});
 }
 
+getWarehouseList();
+getGoodsList();
 getList();
 </script>

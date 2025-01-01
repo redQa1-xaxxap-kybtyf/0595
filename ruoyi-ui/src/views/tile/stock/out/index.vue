@@ -11,7 +11,14 @@
         />
       </el-form-item>
       <el-form-item label="仓库" prop="warehouseId">
-        <warehouse-select v-model="queryParams.warehouseId" />
+        <el-select v-model="queryParams.warehouseId" placeholder="请选择仓库" clearable style="width: 200px">
+          <el-option
+            v-for="item in warehouseOptions"
+            :key="item.warehouseId"
+            :label="item.warehouseName"
+            :value="item.warehouseId"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="出库单状态" clearable style="width: 200px">
@@ -138,7 +145,14 @@
     <el-dialog :title="title" v-model="open" width="800px" append-to-body>
       <el-form ref="stockOutRef" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="仓库" prop="warehouseId">
-          <warehouse-select v-model="form.warehouseId" :disabled="form.status !== '1'" />
+          <el-select v-model="form.warehouseId" placeholder="请选择仓库" :disabled="form.status !== '1'">
+            <el-option
+              v-for="item in warehouseOptions"
+              :key="item.warehouseId"
+              :label="item.warehouseName"
+              :value="item.warehouseId"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" :disabled="form.status !== '1'" />
@@ -146,13 +160,16 @@
         <el-form-item label="出库明细">
           <el-table :data="form.details" :border="true">
             <el-table-column type="index" label="序号" width="50" />
-            <el-table-column label="商品" prop="goodsName">
+            <el-table-column label="商品" prop="goodsId">
               <template #default="scope">
-                <goods-select 
-                  v-model="scope.row.goodsId" 
-                  @update:modelValue="(val) => handleGoodsChange(val, scope.$index)"
-                  :disabled="form.status !== '1'"
-                />
+                <el-select v-model="scope.row.goodsId" placeholder="请选择商品" :disabled="form.status !== '1'">
+                  <el-option
+                    v-for="item in goodsOptions"
+                    :key="item.goodsId"
+                    :label="item.goodsName"
+                    :value="item.goodsId"
+                  />
+                </el-select>
               </template>
             </el-table-column>
             <el-table-column label="数量" prop="quantity" width="150">
@@ -196,10 +213,14 @@
 
 <script setup name="StockOut">
 import { listStockOut, getStockOut, addStockOut, updateStockOut, delStockOut, submitStockOut, cancelStockOut } from "@/api/tile/stock";
+import { listWarehouse } from "@/api/tile/warehouse";
+import { listGoods } from "@/api/tile/goods";
+
 import { ref, reactive, onMounted } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 
 const { proxy } = getCurrentInstance();
+const { sys_normal_disable, tile_stock_out_status } = proxy.useDict("sys_normal_disable", "tile_stock_out_status");
 
 // 遮罩层
 const loading = ref(false);
@@ -219,6 +240,12 @@ const stockOutList = ref([]);
 const title = ref("");
 // 是否显示弹出层
 const open = ref(false);
+// 日期范围
+const dateRange = ref([]);
+// 仓库选项列表
+const warehouseOptions = ref([]);
+// 商品选项列表
+const goodsOptions = ref([]);
 
 // 查询参数
 const queryParams = ref({
@@ -252,10 +279,24 @@ const rules = ref({
 /** 查询出库单列表 */
 function getList() {
   loading.value = true;
-  listStockOut(queryParams.value).then(response => {
+  listStockOut(proxy.addDateRange(queryParams.value, dateRange.value)).then(response => {
     stockOutList.value = response.rows;
     total.value = response.total;
     loading.value = false;
+  });
+}
+
+/** 查询仓库列表 */
+function getWarehouseList() {
+  listWarehouse().then(response => {
+    warehouseOptions.value = response.rows;
+  });
+}
+
+/** 查询商品列表 */
+function getGoodsList() {
+  listGoods().then(response => {
+    goodsOptions.value = response.rows;
   });
 }
 
@@ -406,17 +447,6 @@ function handleDeleteDetail(index) {
   form.value.details.splice(index, 1);
 }
 
-/** 商品选择事件 */
-function handleGoodsChange(val, index) {
-  if (val) {
-    proxy.$refs["goodsSelect" + index].getGoodsName().then(name => {
-      form.value.details[index].goodsName = name;
-    });
-  } else {
-    form.value.details[index].goodsName = undefined;
-  }
-}
-
 /** 多选框选中数据 */
 function handleSelectionChange(selection) {
   ids.value = selection.map(item => item.outId);
@@ -426,5 +456,7 @@ function handleSelectionChange(selection) {
 
 onMounted(() => {
   getList();
+  getWarehouseList();
+  getGoodsList();
 });
 </script>
