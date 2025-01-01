@@ -3,16 +3,15 @@ package com.ruoyi.system.tile.service.impl;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.common.constant.UserConstants;
-import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.tile.mapper.TileSpecMapper;
 import com.ruoyi.system.tile.domain.TileSpec;
 import com.ruoyi.system.tile.service.ITileSpecService;
 
 /**
- * 规格尺寸管理 服务层实现
+ * 规格Service业务层处理
  * 
  * @author ruoyi
+ * @date 2024-01-01
  */
 @Service
 public class TileSpecServiceImpl implements ITileSpecService
@@ -21,10 +20,10 @@ public class TileSpecServiceImpl implements ITileSpecService
     private TileSpecMapper tileSpecMapper;
 
     /**
-     * 查询规格尺寸列表
+     * 查询规格列表
      * 
-     * @param spec 规格尺寸信息
-     * @return 规格尺寸集合
+     * @param spec 规格信息
+     * @return 规格集合
      */
     @Override
     public List<TileSpec> selectTileSpecList(TileSpec spec)
@@ -36,7 +35,7 @@ public class TileSpecServiceImpl implements ITileSpecService
      * 通过规格ID查询规格
      * 
      * @param specId 规格ID
-     * @return 规格尺寸信息
+     * @return 规格信息
      */
     @Override
     public TileSpec selectTileSpecById(Long specId)
@@ -57,9 +56,9 @@ public class TileSpecServiceImpl implements ITileSpecService
     }
 
     /**
-     * 新增规格尺寸信息
+     * 新增规格信息
      * 
-     * @param spec 规格尺寸信息
+     * @param spec 规格信息
      * @return 结果
      */
     @Override
@@ -69,9 +68,9 @@ public class TileSpecServiceImpl implements ITileSpecService
     }
 
     /**
-     * 修改规格尺寸信息
+     * 修改规格信息
      * 
-     * @param spec 规格尺寸信息
+     * @param spec 规格信息
      * @return 结果
      */
     @Override
@@ -81,7 +80,7 @@ public class TileSpecServiceImpl implements ITileSpecService
     }
 
     /**
-     * 删除规格尺寸信息
+     * 删除规格信息
      * 
      * @param specId 规格ID
      * @return 结果
@@ -93,7 +92,7 @@ public class TileSpecServiceImpl implements ITileSpecService
     }
 
     /**
-     * 批量删除规格尺寸信息
+     * 批量删除规格信息
      * 
      * @param specIds 需要删除的规格ID
      * @return 结果
