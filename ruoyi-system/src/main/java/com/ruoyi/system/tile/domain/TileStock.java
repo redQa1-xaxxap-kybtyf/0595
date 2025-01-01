@@ -26,6 +26,17 @@ public class TileStock extends BaseEntity
     @NotNull(message = "仓库不能为空")
     private Long warehouseId;
 
+    /** 仓位ID */
+    private Long positionId;
+
+    /** 仓位编号 */
+    @Excel(name = "仓位编号")
+    private String positionCode;
+
+    /** 仓位名称 */
+    @Excel(name = "仓位名称")
+    private String positionName;
+
     /** 库存数量 */
     @Excel(name = "库存数量")
     private Long quantity;
@@ -77,6 +88,36 @@ public class TileStock extends BaseEntity
     public Long getWarehouseId() 
     {
         return warehouseId;
+    }
+
+    public Long getPositionId() 
+    {
+        return positionId;
+    }
+
+    public void setPositionId(Long positionId) 
+    {
+        this.positionId = positionId;
+    }
+
+    public String getPositionCode() 
+    {
+        return positionCode;
+    }
+
+    public void setPositionCode(String positionCode) 
+    {
+        this.positionCode = positionCode;
+    }
+
+    public String getPositionName() 
+    {
+        return positionName;
+    }
+
+    public void setPositionName(String positionName) 
+    {
+        this.positionName = positionName;
     }
 
     public void setQuantity(Long quantity) 
@@ -145,6 +186,7 @@ public class TileStock extends BaseEntity
             .append("stockId", getStockId())
             .append("goodsId", getGoodsId())
             .append("warehouseId", getWarehouseId())
+            .append("positionId", getPositionId())
             .append("quantity", getQuantity())
             .append("status", getStatus())
             .append("delFlag", getDelFlag())
@@ -156,6 +198,8 @@ public class TileStock extends BaseEntity
             .append("goodsName", getGoodsName())
             .append("goodsCode", getGoodsCode())
             .append("warehouseName", getWarehouseName())
+            .append("positionCode", getPositionCode())
+            .append("positionName", getPositionName())
             .toString();
     }
 }

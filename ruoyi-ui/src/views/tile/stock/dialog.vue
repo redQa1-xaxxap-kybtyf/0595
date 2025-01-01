@@ -12,12 +12,22 @@
         </el-select>
       </el-form-item>
       <el-form-item label="仓库" prop="warehouseId">
-        <el-select v-model="form.warehouseId" placeholder="请选择仓库" clearable>
+        <el-select v-model="form.warehouseId" placeholder="请选择仓库" clearable @change="handleWarehouseChange">
           <el-option
             v-for="item in warehouseList"
             :key="item.warehouseId"
             :label="item.warehouseName"
             :value="item.warehouseId"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="仓位" prop="positionId">
+        <el-select v-model="form.positionId" placeholder="请选择仓位" clearable>
+          <el-option
+            v-for="item in positionList"
+            :key="item.positionId"
+            :label="item.positionName"
+            :value="item.positionId"
           />
         </el-select>
       </el-form-item>
@@ -49,7 +59,7 @@
 <script setup name="StockDialog">
 import { getStock, addStock, updateStock } from "@/api/tile/stock";
 import { listGoods } from "@/api/tile/goods";
-import { listWarehouse } from "@/api/tile/warehouse";
+import { listWarehouse, listWarehousePosition } from "@/api/tile/warehouse";
 
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict("sys_normal_disable");
@@ -59,6 +69,7 @@ const loading = ref(true);
 const title = ref("");
 const goodsList = ref([]);
 const warehouseList = ref([]);
+const positionList = ref([]);
 
 const emit = defineEmits(["refresh"]);
 
@@ -67,6 +78,7 @@ const data = reactive({
     stockId: undefined,
     goodsId: undefined,
     warehouseId: undefined,
+    positionId: undefined,
     quantity: 0,
     status: "0",
     remark: undefined
@@ -77,6 +89,9 @@ const data = reactive({
     ],
     warehouseId: [
       { required: true, message: "仓库不能为空", trigger: "change" }
+    ],
+    positionId: [
+      { required: true, message: "仓位不能为空", trigger: "change" }
     ],
     quantity: [
       { required: true, message: "库存数量不能为空", trigger: "blur" }
@@ -103,6 +118,18 @@ function getWarehouseList() {
   });
 }
 
+/** 仓库选择改变时获取仓位列表 */
+function handleWarehouseChange(warehouseId) {
+  if (!warehouseId) {
+    positionList.value = [];
+    form.value.positionId = undefined;
+    return;
+  }
+  listWarehousePosition({ warehouseId: warehouseId }).then(response => {
+    positionList.value = response.rows;
+  });
+}
+
 /** 取消按钮 */
 function cancel() {
   open.value = false;
@@ -115,10 +142,12 @@ function reset() {
     stockId: undefined,
     goodsId: undefined,
     warehouseId: undefined,
+    positionId: undefined,
     quantity: 0,
     status: "0",
     remark: undefined
   };
+  positionList.value = [];
   proxy.resetForm("stockFormRef");
 }
 
@@ -168,4 +197,5 @@ function submitForm() {
 defineExpose({
   handleAdd,
   handleUpdate
-});</script>
+});
+</script>
