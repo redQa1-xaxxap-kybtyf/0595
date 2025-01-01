@@ -189,7 +189,7 @@ public class TileStockInServiceImpl implements ITileStockInService
             record.setOperType("1"); // 入库
             record.setGoodsId(detail.getGoodsId());
             record.setWarehouseId(stockIn.getWarehouseId());
-            record.setQuantity(detail.getQuantity());
+            record.setQuantity(Long.valueOf(detail.getQuantity()));
             record.setSourceId(stockIn.getInId());
             record.setSourceType("1"); // 入库单
             record.setSourceCode(stockIn.getInCode());
