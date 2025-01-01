@@ -89,11 +89,6 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="库存" prop="stock">
-            <el-input-number v-model="form.stock" :min="0" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
           <el-form-item label="状态" prop="status">
             <el-radio-group v-model="form.status">
               <el-radio :value="'0'">上架</el-radio>
@@ -191,7 +186,6 @@ const form = ref({
   surfaceId: undefined,
   usageId: undefined,
   patternId: undefined,
-  stock: 0,
   status: '0'
 })
 
@@ -219,9 +213,6 @@ const rules = {
   ],
   patternId: [
     { required: true, message: '请选择图案', trigger: 'change' }
-  ],
-  stock: [
-    { required: true, message: '库存不能为空', trigger: 'blur' }
   ],
   goodsImage: [
     { required: true, message: '商品主图不能为空', trigger: 'change' }
@@ -262,6 +253,7 @@ function cancel() {
 }
 
 function reset() {
+  formRef.value?.resetFields()
   form.value = {
     goodsId: undefined,
     goodsCode: undefined,
@@ -273,10 +265,8 @@ function reset() {
     surfaceId: undefined,
     usageId: undefined,
     patternId: undefined,
-    stock: 0,
     status: '0'
   }
-  emit('reset')
 }
 
 defineExpose({
@@ -287,25 +277,27 @@ defineExpose({
 
 <style scoped>
 .avatar-uploader {
-  border: 1px dashed #d9d9d9;
+  border: 1px dashed var(--el-border-color);
   border-radius: 6px;
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  width: 178px;
-  height: 178px;
+  transition: var(--el-transition-duration-fast);
 }
+
 .avatar-uploader:hover {
-  border-color: #409EFF;
+  border-color: var(--el-color-primary);
 }
+
 .avatar-uploader-icon {
   font-size: 28px;
   color: #8c939d;
   width: 178px;
   height: 178px;
-  line-height: 178px;
   text-align: center;
+  line-height: 178px;
 }
+
 .avatar {
   width: 178px;
   height: 178px;
