@@ -97,21 +97,21 @@
     <!-- 数据表格 -->
     <el-table v-loading="loading" :data="goodsList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="商品编号" align="center" prop="goodsCode" />
-      <el-table-column label="商品名称" align="center" prop="goodsName" />
-      <el-table-column label="商品分类" align="center" prop="categoryName" />
-      <el-table-column label="状态" align="center" prop="status">
+      <el-table-column label="商品ID" align="center" prop="goodsId" width="80" />
+      <el-table-column label="商品主图" align="center" width="120">
         <template #default="scope">
-          <el-switch
-            v-model="scope.row.status"
-            :active-value="'0'"
-            :inactive-value="'1'"
-            active-text="上架"
-            inactive-text="下架"
-            @change="handleStatusChange(scope.row)"
+          <el-image
+            style="width: 80px; height: 80px"
+            :src="scope.row.goodsImage"
+            :preview-src-list="[scope.row.goodsImage]"
+            fit="cover"
           />
         </template>
       </el-table-column>
+      <el-table-column label="商品编号" align="center" prop="goodsCode" min-width="120" />
+      <el-table-column label="商品分类" align="center" prop="categoryName" min-width="120" />
+      <el-table-column label="商品规格" align="center" prop="specName" min-width="120" />
+      <el-table-column label="创建时间" align="center" prop="createTime" width="180" />
     </el-table>
     
     <pagination
