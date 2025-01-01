@@ -37,7 +37,7 @@ public class TileStockRecord extends BaseEntity
 
     /** 数量 */
     @Excel(name = "数量")
-    private Integer quantity;
+    private Long quantity;
 
     /** 来源单据ID */
     private Long sourceId;
@@ -118,12 +118,12 @@ public class TileStockRecord extends BaseEntity
         return warehouseName;
     }
 
-    public void setQuantity(Integer quantity) 
+    public void setQuantity(Long quantity) 
     {
         this.quantity = quantity;
     }
 
-    public Integer getQuantity() 
+    public Long getQuantity() 
     {
         return quantity;
     }
