@@ -121,6 +121,7 @@
               :icon="Plus"
               @click="handleAdd(scope.row)"
               v-hasPermi="['tile:category:add']"
+              v-if="scope.row.level < 3"
             >新增</el-button>
             <el-divider direction="vertical" />
             <el-button
@@ -258,28 +259,12 @@ const defaultProps = {
 }
 
 // 过滤节点方法
-function filterNode(value, data) {
-  // 获取节点的层级
-  const nodeLevel = data.level || 1
-  // 如果是新增操作
-  if (!form.value.categoryId) {
-    // 只允许选择二级及以下的分类作为父分类（因为最大是三级）
-    return nodeLevel < 3
-  }
-  // 如果是编辑操作
-  else {
-    // 不能选择自己及其子分类作为父分类
-    const currentId = form.value.categoryId
-    if (data.categoryId === currentId) {
-      return false
-    }
-    // 检查是否是当前节点的子节点
-    if (data.ancestors && data.ancestors.split(',').includes(currentId.toString())) {
-      return false
-    }
-    // 同样限制最大三级
-    return nodeLevel < 3
-  }
+const filterNode = (value, data) => {
+  if (!value) return true
+  const categoryName = data.categoryName || ''
+  // 过滤掉二级分类，因为不能在其下添加子分类
+  if (data.level >= 2) return false
+  return categoryName.indexOf(value) !== -1
 }
 
 // 表单ref
@@ -335,10 +320,21 @@ function resetQuery() {
 }
 
 /** 新增按钮操作 */
-function handleAdd() {
+function handleAdd(row) {
   reset()
+  if (row) {
+    // 如果是从行内新增，检查层级
+    if (row.level >= 2) {
+      ElMessage.warning('最多只能添加三级分类')
+      return
+    }
+    form.value.parentId = row.categoryId
+  } else {
+    // 顶部新增按钮，默认为一级分类
+    form.value.parentId = 0
+  }
   open.value = true
-  title.value = "添加瓷砖分类"
+  title.value = '添加分类'
   listCategory().then(response => {
     const data = response.rows
     // 如果没有任何分类，parentId 默认为 0（作为顶级分类）
