@@ -3,7 +3,6 @@ package com.ruoyi.system.tile.service.impl;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.system.tile.mapper.TileStockMapper;
 import com.ruoyi.system.tile.domain.TileStock;
 import com.ruoyi.system.tile.service.ITileStockService;
@@ -12,6 +11,7 @@ import com.ruoyi.system.tile.service.ITileStockService;
  * 库存管理Service业务层处理
  * 
  * @author ruoyi
+ * @date 2024-01-01
  */
 @Service
 public class TileStockServiceImpl implements ITileStockService 
@@ -148,34 +148,14 @@ public class TileStockServiceImpl implements ITileStockService
             TileStock existStock = stocks.get(0);
             if (existStock.getQuantity() < quantity)
             {
-                throw new RuntimeException("库存不足");
+                throw new ServiceException("库存不足");
             }
             existStock.setQuantity(existStock.getQuantity() - quantity);
             return tileStockMapper.updateTileStock(existStock);
         }
         else
         {
-            throw new RuntimeException("库存不存在");
+            throw new ServiceException("库存不存在");
         }
-    }
-
-    /**
-     * 根据商品ID和仓库ID查询库存记录
-     * 
-     * @param goodsId 商品ID
-     * @param warehouseId 仓库ID
-     * @return 库存记录
-     */
-    private TileStock selectTileStockByGoodsIdAndWarehouseId(Long goodsId, Long warehouseId)
-    {
-        TileStock stock = new TileStock();
-        stock.setGoodsId(goodsId);
-        stock.setWarehouseId(warehouseId);
-        List<TileStock> stocks = tileStockMapper.selectTileStockList(stock);
-        if (stocks != null && !stocks.isEmpty())
-        {
-            return stocks.get(0);
-        }
-        return null;
     }
 }
