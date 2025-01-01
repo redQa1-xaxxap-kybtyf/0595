@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.tile.mapper.TileStockOutMapper">
+    
+    <resultMap type="TileStockOut" id="TileStockOutResult">
+        <result property="outId"    column="out_id"    />
+        <result property="outCode"    column="out_code"    />
+        <result property="warehouseId"    column="warehouse_id"    />
+        <result property="warehouseName"    column="warehouse_name"    />
+        <result property="status"    column="status"    />
+        <result property="remark"    column="remark"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectTileStockOutVo">
+        select o.out_id, o.out_code, o.warehouse_id, w.warehouse_name, o.status, o.remark, o.create_by, o.create_time, o.update_by, o.update_time
+        from tile_stock_out o
+        left join tile_warehouse w on w.warehouse_id = o.warehouse_id
+    </sql>
+
+    <select id="selectTileStockOutList" parameterType="TileStockOut" resultMap="TileStockOutResult">
+        <include refid="selectTileStockOutVo"/>
+        <where>  
+            <if test="outCode != null  and outCode != ''"> and o.out_code = #{outCode}</if>
+            <if test="warehouseId != null "> and o.warehouse_id = #{warehouseId}</if>
+            <if test="status != null  and status != ''"> and o.status = #{status}</if>
+        </where>
+        order by o.create_time desc
+    </select>
+    
+    <select id="selectTileStockOutByOutId" parameterType="Long" resultMap="TileStockOutResult">
+        <include refid="selectTileStockOutVo"/>
+        where o.out_id = #{outId}
+    </select>
+        
+    <insert id="insertTileStockOut" parameterType="TileStockOut" useGeneratedKeys="true" keyProperty="outId">
+        insert into tile_stock_out
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="outCode != null">out_code,</if>
+            <if test="warehouseId != null">warehouse_id,</if>
+            <if test="status != null">status,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="outCode != null">#{outCode},</if>
+            <if test="warehouseId != null">#{warehouseId},</if>
+            <if test="status != null">#{status},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTileStockOut" parameterType="TileStockOut">
+        update tile_stock_out
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="outCode != null">out_code = #{outCode},</if>
+            <if test="warehouseId != null">warehouse_id = #{warehouseId},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where out_id = #{outId}
+    </update>
+
+    <delete id="deleteTileStockOutByOutId" parameterType="Long">
+        delete from tile_stock_out where out_id = #{outId}
+    </delete>
+
+    <delete id="deleteTileStockOutByOutIds" parameterType="String">
+        delete from tile_stock_out where out_id in 
+        <foreach item="outId" collection="array" open="(" separator="," close=")">
+            #{outId}
+        </foreach>
+    </delete>
+</mapper>

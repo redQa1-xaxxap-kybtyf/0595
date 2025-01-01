@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.tile.mapper.TileStockOutDetailMapper">
+    
+    <resultMap type="TileStockOutDetail" id="TileStockOutDetailResult">
+        <result property="detailId"    column="detail_id"    />
+        <result property="outId"    column="out_id"    />
+        <result property="goodsId"    column="goods_id"    />
+        <result property="goodsName"    column="goods_name"    />
+        <result property="quantity"    column="quantity"    />
+    </resultMap>
+
+    <sql id="selectTileStockOutDetailVo">
+        select d.detail_id, d.out_id, d.goods_id, g.goods_name, d.quantity
+        from tile_stock_out_detail d
+        left join tile_goods g on g.goods_id = d.goods_id
+    </sql>
+
+    <select id="selectTileStockOutDetailList" parameterType="TileStockOutDetail" resultMap="TileStockOutDetailResult">
+        <include refid="selectTileStockOutDetailVo"/>
+        <where>  
+            <if test="outId != null "> and d.out_id = #{outId}</if>
+            <if test="goodsId != null "> and d.goods_id = #{goodsId}</if>
+        </where>
+    </select>
+    
+    <select id="selectTileStockOutDetailByDetailId" parameterType="Long" resultMap="TileStockOutDetailResult">
+        <include refid="selectTileStockOutDetailVo"/>
+        where d.detail_id = #{detailId}
+    </select>
+
+    <select id="selectTileStockOutDetailByOutId" parameterType="Long" resultMap="TileStockOutDetailResult">
+        <include refid="selectTileStockOutDetailVo"/>
+        where d.out_id = #{outId}
+    </select>
+        
+    <insert id="insertTileStockOutDetail" parameterType="TileStockOutDetail" useGeneratedKeys="true" keyProperty="detailId">
+        insert into tile_stock_out_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="outId != null">out_id,</if>
+            <if test="goodsId != null">goods_id,</if>
+            <if test="quantity != null">quantity,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="outId != null">#{outId},</if>
+            <if test="goodsId != null">#{goodsId},</if>
+            <if test="quantity != null">#{quantity},</if>
+         </trim>
+    </insert>
+
+    <insert id="batchInsertTileStockOutDetail">
+        insert into tile_stock_out_detail (out_id, goods_id, quantity) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (#{item.outId}, #{item.goodsId}, #{item.quantity})
+        </foreach>
+    </insert>
+
+    <update id="updateTileStockOutDetail" parameterType="TileStockOutDetail">
+        update tile_stock_out_detail
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="outId != null">out_id = #{outId},</if>
+            <if test="goodsId != null">goods_id = #{goodsId},</if>
+            <if test="quantity != null">quantity = #{quantity},</if>
+        </trim>
+        where detail_id = #{detailId}
+    </update>
+
+    <delete id="deleteTileStockOutDetailByDetailId" parameterType="Long">
+        delete from tile_stock_out_detail where detail_id = #{detailId}
+    </delete>
+
+    <delete id="deleteTileStockOutDetailByDetailIds" parameterType="String">
+        delete from tile_stock_out_detail where detail_id in 
+        <foreach item="detailId" collection="array" open="(" separator="," close=")">
+            #{detailId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteTileStockOutDetailByOutId" parameterType="Long">
+        delete from tile_stock_out_detail where out_id = #{outId}
+    </delete>
+</mapper>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.tile.mapper.TileWarehouseMapper">
+    
+    <resultMap type="com.ruoyi.system.tile.domain.TileWarehouse" id="TileWarehouseResult">
+        <result property="warehouseId"    column="warehouse_id"    />
+        <result property="warehouseName"  column="warehouse_name"  />
+        <result property="warehouseCode"  column="warehouse_code"  />
+        <result property="warehouseType"  column="warehouse_type"  />
+        <result property="address"        column="address"         />
+        <result property="area"           column="area"           />
+        <result property="manager"        column="manager"        />
+        <result property="phone"          column="phone"          />
+        <result property="status"         column="status"         />
+        <result property="delFlag"        column="del_flag"       />
+        <result property="createBy"       column="create_by"      />
+        <result property="createTime"     column="create_time"    />
+        <result property="updateBy"       column="update_by"      />
+        <result property="updateTime"     column="update_time"    />
+        <result property="remark"         column="remark"         />
+    </resultMap>
+
+    <sql id="selectTileWarehouseVo">
+        select warehouse_id, warehouse_name, warehouse_code, warehouse_type, address, area, manager, phone, status, del_flag, create_by, create_time, update_by, update_time, remark 
+        from tile_warehouse
+    </sql>
+
+    <select id="selectTileWarehouseList" parameterType="com.ruoyi.system.tile.domain.TileWarehouse" resultMap="TileWarehouseResult">
+        <include refid="selectTileWarehouseVo"/>
+        <where>  
+            <if test="warehouseName != null  and warehouseName != ''"> and warehouse_name like concat('%', #{warehouseName}, '%')</if>
+            <if test="warehouseCode != null  and warehouseCode != ''"> and warehouse_code = #{warehouseCode}</if>
+            <if test="warehouseType != null  and warehouseType != ''"> and warehouse_type = #{warehouseType}</if>
+            <if test="manager != null  and manager != ''"> and manager = #{manager}</if>
+            <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            and del_flag = '0'
+        </where>
+    </select>
+    
+    <select id="selectTileWarehouseByWarehouseId" parameterType="Long" resultMap="TileWarehouseResult">
+        <include refid="selectTileWarehouseVo"/>
+        where warehouse_id = #{warehouseId} and del_flag = '0'
+    </select>
+        
+    <insert id="insertTileWarehouse" parameterType="com.ruoyi.system.tile.domain.TileWarehouse" useGeneratedKeys="true" keyProperty="warehouseId">
+        insert into tile_warehouse
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="warehouseName != null">warehouse_name,</if>
+            <if test="warehouseCode != null">warehouse_code,</if>
+            <if test="warehouseType != null">warehouse_type,</if>
+            <if test="address != null">address,</if>
+            <if test="area != null">area,</if>
+            <if test="manager != null">manager,</if>
+            <if test="phone != null">phone,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="warehouseName != null">#{warehouseName},</if>
+            <if test="warehouseCode != null">#{warehouseCode},</if>
+            <if test="warehouseType != null">#{warehouseType},</if>
+            <if test="address != null">#{address},</if>
+            <if test="area != null">#{area},</if>
+            <if test="manager != null">#{manager},</if>
+            <if test="phone != null">#{phone},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTileWarehouse" parameterType="com.ruoyi.system.tile.domain.TileWarehouse">
+        update tile_warehouse
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="warehouseName != null">warehouse_name = #{warehouseName},</if>
+            <if test="warehouseCode != null">warehouse_code = #{warehouseCode},</if>
+            <if test="warehouseType != null">warehouse_type = #{warehouseType},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="area != null">area = #{area},</if>
+            <if test="manager != null">manager = #{manager},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where warehouse_id = #{warehouseId}
+    </update>
+
+    <delete id="deleteTileWarehouseByWarehouseId" parameterType="Long">
+        update tile_warehouse set del_flag = '2' where warehouse_id = #{warehouseId}
+    </delete>
+
+    <delete id="deleteTileWarehouseByWarehouseIds" parameterType="String">
+        update tile_warehouse set del_flag = '2' where warehouse_id in 
+        <foreach item="warehouseId" collection="array" open="(" separator="," close=")">
+            #{warehouseId}
+        </foreach>
+    </delete>
+</mapper>

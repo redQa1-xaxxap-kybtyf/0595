@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.tile.mapper.TileStockRecordMapper">
+    
+    <resultMap type="TileStockRecord" id="TileStockRecordResult">
+        <result property="recordId"    column="record_id"    />
+        <result property="operType"    column="oper_type"    />
+        <result property="goodsId"    column="goods_id"    />
+        <result property="goodsName"    column="goods_name"    />
+        <result property="warehouseId"    column="warehouse_id"    />
+        <result property="warehouseName"    column="warehouse_name"    />
+        <result property="quantity"    column="quantity"    />
+        <result property="sourceId"    column="source_id"    />
+        <result property="sourceType"    column="source_type"    />
+        <result property="sourceCode"    column="source_code"    />
+        <result property="operTime"    column="oper_time"    />
+        <result property="operBy"    column="oper_by"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectTileStockRecordVo">
+        select r.record_id, r.oper_type, r.goods_id, g.goods_name, r.warehouse_id, w.warehouse_name, r.quantity, 
+        r.source_id, r.source_type, r.source_code, r.oper_time, r.oper_by, r.remark
+        from tile_stock_record r
+        left join tile_goods g on g.goods_id = r.goods_id
+        left join tile_warehouse w on w.warehouse_id = r.warehouse_id
+    </sql>
+
+    <select id="selectTileStockRecordList" parameterType="TileStockRecord" resultMap="TileStockRecordResult">
+        <include refid="selectTileStockRecordVo"/>
+        <where>  
+            <if test="operType != null  and operType != ''"> and r.oper_type = #{operType}</if>
+            <if test="goodsId != null "> and r.goods_id = #{goodsId}</if>
+            <if test="warehouseId != null "> and r.warehouse_id = #{warehouseId}</if>
+            <if test="sourceType != null  and sourceType != ''"> and r.source_type = #{sourceType}</if>
+            <if test="sourceCode != null  and sourceCode != ''"> and r.source_code = #{sourceCode}</if>
+            <if test="operTime != null "> and r.oper_time = #{operTime}</if>
+            <if test="params.beginOperTime != null and params.beginOperTime != ''"><!-- 开始时间检索 -->
+                and date_format(r.oper_time,'%y%m%d') &gt;= date_format(#{params.beginOperTime},'%y%m%d')
+            </if>
+            <if test="params.endOperTime != null and params.endOperTime != ''"><!-- 结束时间检索 -->
+                and date_format(r.oper_time,'%y%m%d') &lt;= date_format(#{params.endOperTime},'%y%m%d')
+            </if>
+        </where>
+        order by r.oper_time desc
+    </select>
+    
+    <select id="selectTileStockRecordByRecordId" parameterType="Long" resultMap="TileStockRecordResult">
+        <include refid="selectTileStockRecordVo"/>
+        where r.record_id = #{recordId}
+    </select>
+        
+    <insert id="insertTileStockRecord" parameterType="TileStockRecord">
+        insert into tile_stock_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="recordId != null">record_id,</if>
+            <if test="operType != null">oper_type,</if>
+            <if test="goodsId != null">goods_id,</if>
+            <if test="warehouseId != null">warehouse_id,</if>
+            <if test="quantity != null">quantity,</if>
+            <if test="sourceId != null">source_id,</if>
+            <if test="sourceType != null">source_type,</if>
+            <if test="sourceCode != null">source_code,</if>
+            <if test="operTime != null">oper_time,</if>
+            <if test="operBy != null">oper_by,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="recordId != null">#{recordId},</if>
+            <if test="operType != null">#{operType},</if>
+            <if test="goodsId != null">#{goodsId},</if>
+            <if test="warehouseId != null">#{warehouseId},</if>
+            <if test="quantity != null">#{quantity},</if>
+            <if test="sourceId != null">#{sourceId},</if>
+            <if test="sourceType != null">#{sourceType},</if>
+            <if test="sourceCode != null">#{sourceCode},</if>
+            <if test="operTime != null">#{operTime},</if>
+            <if test="operBy != null">#{operBy},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTileStockRecord" parameterType="TileStockRecord">
+        update tile_stock_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="operType != null">oper_type = #{operType},</if>
+            <if test="goodsId != null">goods_id = #{goodsId},</if>
+            <if test="warehouseId != null">warehouse_id = #{warehouseId},</if>
+            <if test="quantity != null">quantity = #{quantity},</if>
+            <if test="sourceId != null">source_id = #{sourceId},</if>
+            <if test="sourceType != null">source_type = #{sourceType},</if>
+            <if test="sourceCode != null">source_code = #{sourceCode},</if>
+            <if test="operTime != null">oper_time = #{operTime},</if>
+            <if test="operBy != null">oper_by = #{operBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where record_id = #{recordId}
+    </update>
+
+    <delete id="deleteTileStockRecordByRecordId" parameterType="Long">
+        delete from tile_stock_record where record_id = #{recordId}
+    </delete>
+
+    <delete id="deleteTileStockRecordByRecordIds" parameterType="String">
+        delete from tile_stock_record where record_id in 
+        <foreach item="recordId" collection="array" open="(" separator="," close=")">
+            #{recordId}
+        </foreach>
+    </delete>
+
+    <update id="cleanTileStockRecord">
+        truncate table tile_stock_record
+    </update>
+</mapper>

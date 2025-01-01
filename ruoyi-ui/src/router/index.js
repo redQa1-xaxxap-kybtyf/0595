@@ -33,28 +33,30 @@ export const constantRoutes = [
     children: [
       {
         path: '/redirect/:path(.*)',
-        component: () => import('@/views/redirect/index.vue')
+        component: () => import('@/views/redirect'),
+        name: 'Redirect',
+        meta: { title: '重定向', noCache: true }
       }
     ]
   },
   {
     path: '/login',
-    component: () => import('@/views/login.vue'),
+    component: () => import('@/views/login'),
     hidden: true
   },
   {
     path: '/register',
-    component: () => import('@/views/register.vue'),
+    component: () => import('@/views/register'),
     hidden: true
   },
   {
     path: "/:pathMatch(.*)*",
-    component: () => import('@/views/error/404.vue'),
+    component: () => import('@/views/error/404'),
     hidden: true
   },
   {
     path: '/401',
-    component: () => import('@/views/error/401.vue'),
+    component: () => import('@/views/error/401'),
     hidden: true
   },
   {
@@ -64,7 +66,7 @@ export const constantRoutes = [
     children: [
       {
         path: '/index',
-        component: () => import('@/views/index.vue'),
+        component: () => import('@/views/index'),
         name: 'Index',
         meta: { title: '首页', icon: 'dashboard', affix: true }
       }
@@ -78,7 +80,7 @@ export const constantRoutes = [
     children: [
       {
         path: 'profile',
-        component: () => import('@/views/system/user/profile/index.vue'),
+        component: () => import('@/views/system/user/profile/index'),
         name: 'Profile',
         meta: { title: '个人中心', icon: 'user' }
       }
@@ -96,7 +98,7 @@ export const dynamicRoutes = [
     children: [
       {
         path: 'role/:userId(\\d+)',
-        component: () => import('@/views/system/user/authRole.vue'),
+        component: () => import('@/views/system/user/authRole'),
         name: 'AuthRole',
         meta: { title: '分配角色', activeMenu: '/system/user' }
       }
@@ -110,7 +112,7 @@ export const dynamicRoutes = [
     children: [
       {
         path: 'user/:roleId(\\d+)',
-        component: () => import('@/views/system/role/authUser.vue'),
+        component: () => import('@/views/system/role/authUser'),
         name: 'AuthUser',
         meta: { title: '分配用户', activeMenu: '/system/role' }
       }
@@ -124,7 +126,7 @@ export const dynamicRoutes = [
     children: [
       {
         path: 'index/:dictId(\\d+)',
-        component: () => import('@/views/system/dict/data.vue'),
+        component: () => import('@/views/system/dict/data'),
         name: 'Data',
         meta: { title: '字典数据', activeMenu: '/system/dict' }
       }
@@ -138,7 +140,7 @@ export const dynamicRoutes = [
     children: [
       {
         path: 'index/:jobId(\\d+)',
-        component: () => import('@/views/monitor/job/log.vue'),
+        component: () => import('@/views/monitor/job/log'),
         name: 'JobLog',
         meta: { title: '调度日志', activeMenu: '/monitor/job' }
       }
@@ -152,7 +154,7 @@ export const dynamicRoutes = [
     children: [
       {
         path: 'index/:tableId(\\d+)',
-        component: () => import('@/views/tool/gen/editTable.vue'),
+        component: () => import('@/views/tool/gen/editTable'),
         name: 'GenEdit',
         meta: { title: '修改生成配置', activeMenu: '/tool/gen' }
       }
@@ -166,27 +168,45 @@ export const dynamicRoutes = [
     children: [
       {
         path: 'pattern',
-        component: () => import('@/views/tile/config/pattern/index.vue'),
+        component: () => import('@/views/tile/config/pattern/index'),
         name: 'Pattern',
         meta: { title: '图案管理', icon: 'list' }
       },
       {
         path: 'surface',
-        component: () => import('@/views/tile/config/surface/index.vue'),
+        component: () => import('@/views/tile/config/surface/index'),
         name: 'Surface',
         meta: { title: '表面处理管理', icon: 'list' }
       },
       {
         path: 'material',
-        component: () => import('@/views/tile/config/material/index.vue'),
+        component: () => import('@/views/tile/config/material/index'),
         name: 'Material',
         meta: { title: '材质管理', icon: 'list' }
       },
       {
         path: 'usage',
-        component: () => import('@/views/tile/config/usage/index.vue'),
+        component: () => import('@/views/tile/config/usage/index'),
         name: 'Usage',
         meta: { title: '用途管理', icon: 'list' }
+      },
+      {
+        path: 'stock/in',
+        component: () => import('@/views/tile/stock/in/index'),
+        name: 'TileStockIn',
+        meta: { title: '入库管理', icon: 'form' }
+      },
+      {
+        path: 'stock/out',
+        component: () => import('@/views/tile/stock/out/index'),
+        name: 'TileStockOut',
+        meta: { title: '出库管理', icon: 'form' }
+      },
+      {
+        path: 'stock/warehouse',
+        component: () => import('@/views/tile/stock/warehouse/index'),
+        name: 'TileStockWarehouse',
+        meta: { title: '仓库管理', icon: 'form' }
       }
     ]
   }
