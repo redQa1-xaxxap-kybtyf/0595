@@ -79,8 +79,6 @@
       <el-table-column label="商品编号" align="center" prop="goodsCode" />
       <el-table-column label="仓库名称" align="center" prop="warehouseName" />
       <el-table-column label="库存数量" align="center" prop="quantity" />
-      <el-table-column label="最小库存" align="center" prop="minStock" />
-      <el-table-column label="最大库存" align="center" prop="maxStock" />
       <el-table-column label="状态" align="center" prop="status">
         <template #default="scope">
           <dict-tag :options="sys_normal_disable" :value="scope.row.status"/>

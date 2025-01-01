@@ -24,12 +24,6 @@
       <el-form-item label="库存数量" prop="quantity">
         <el-input-number v-model="form.quantity" :min="0" controls-position="right" placeholder="请输入库存数量" />
       </el-form-item>
-      <el-form-item label="最小库存" prop="minStock">
-        <el-input-number v-model="form.minStock" :min="0" controls-position="right" placeholder="请输入最小库存" />
-      </el-form-item>
-      <el-form-item label="最大库存" prop="maxStock">
-        <el-input-number v-model="form.maxStock" :min="0" controls-position="right" placeholder="请输入最大库存" />
-      </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-radio-group v-model="form.status">
           <el-radio
@@ -74,8 +68,6 @@ const data = reactive({
     goodsId: undefined,
     warehouseId: undefined,
     quantity: 0,
-    minStock: 0,
-    maxStock: 0,
     status: "0",
     remark: undefined
   },
@@ -124,8 +116,6 @@ function reset() {
     goodsId: undefined,
     warehouseId: undefined,
     quantity: 0,
-    minStock: 0,
-    maxStock: 0,
     status: "0",
     remark: undefined
   };
