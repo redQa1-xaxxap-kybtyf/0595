@@ -193,26 +193,8 @@ const rules = {
   goodsCode: [
     { required: true, message: '商品编号不能为空', trigger: 'blur' }
   ],
-  goodsName: [
-    { required: true, message: '商品名称不能为空', trigger: 'blur' }
-  ],
   categoryId: [
-    { required: true, message: '请选择商品分类', trigger: 'change' }
-  ],
-  specId: [
-    { required: true, message: '请选择规格尺寸', trigger: 'change' }
-  ],
-  materialId: [
-    { required: true, message: '请选择材质', trigger: 'change' }
-  ],
-  surfaceId: [
-    { required: true, message: '请选择表面处理', trigger: 'change' }
-  ],
-  usageId: [
-    { required: true, message: '请选择用途', trigger: 'change' }
-  ],
-  patternId: [
-    { required: true, message: '请选择图案', trigger: 'change' }
+    { required: true, message: '商品分类不能为空', trigger: 'change' }
   ],
   goodsImage: [
     { required: true, message: '商品主图不能为空', trigger: 'change' }

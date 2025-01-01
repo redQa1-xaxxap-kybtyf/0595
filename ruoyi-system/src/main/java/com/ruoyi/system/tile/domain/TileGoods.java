@@ -1,6 +1,5 @@
 package com.ruoyi.system.tile.domain;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -25,7 +24,6 @@ public class TileGoods extends BaseEntity
     private String goodsCode;
 
     /** 商品名称 */
-    @NotBlank(message = "商品名称不能为空")
     @Size(min = 0, max = 100, message = "商品名称长度不能超过100个字符")
     private String goodsName;
 
