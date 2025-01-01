@@ -25,7 +25,6 @@ public class TileGoods extends BaseEntity
     private String goodsCode;
 
     /** 商品名称 */
-    @Size(min = 0, max = 100, message = "商品名称长度不能超过100个字符")
     private String goodsName;
 
     /** 商品分类ID */
@@ -33,6 +32,7 @@ public class TileGoods extends BaseEntity
     private Long categoryId;
 
     /** 规格尺寸ID */
+    @NotNull(message = "规格尺寸不能为空")
     private Long specId;
 
     /** 材质ID */

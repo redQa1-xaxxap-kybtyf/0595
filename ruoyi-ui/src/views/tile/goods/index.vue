@@ -115,6 +115,41 @@
       <el-table-column label="商品分类" align="center" prop="categoryName" min-width="120" />
       <el-table-column label="商品规格" align="center" prop="specName" min-width="120" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180" />
+      <el-table-column label="状态" align="center" width="100">
+        <template #default="scope">
+          <el-switch
+            v-model="scope.row.status"
+            :active-value="'0'"
+            :inactive-value="'1'"
+            @change="handleStatusChange(scope.row)"
+          />
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+        <template #default="scope">
+          <el-button
+            type="primary"
+            link
+            :icon="View"
+            @click="handleView(scope.row)"
+            v-hasPermi="['tile:goods:query']"
+          >详情</el-button>
+          <el-button
+            type="primary"
+            link
+            :icon="Edit"
+            @click="handleUpdate(scope.row)"
+            v-hasPermi="['tile:goods:edit']"
+          >修改</el-button>
+          <el-button
+            type="primary"
+            link
+            :icon="Delete"
+            @click="handleDelete(scope.row)"
+            v-hasPermi="['tile:goods:remove']"
+          >删除</el-button>
+        </template>
+      </el-table-column>
     </el-table>
     
     <pagination
@@ -137,13 +172,18 @@
       @change="handleDialogChange"
       @reset="handleDialogReset"
     />
+    <goods-detail
+      ref="goodsDetail"
+      v-model="detailDialog.visible"
+      :title="detailDialog.title"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, getCurrentInstance, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, Edit, Delete, Search, Refresh, Download } from '@element-plus/icons-vue'
+import { Plus, Edit, Delete, Search, Refresh, Download, View } from '@element-plus/icons-vue'
 import { 
   listGoods, 
   getGoods, 
@@ -160,9 +200,11 @@ import { listSurface } from '@/api/tile/surface'
 import { listUsage } from '@/api/tile/usage'
 import { listPattern } from '@/api/tile/pattern'
 import GoodsDialog from './dialog.vue'
+import GoodsDetail from './detail.vue'
 
 const { proxy } = getCurrentInstance()
 const goodsDialog = ref()
+const goodsDetail = ref()
 const loading = ref(false)
 const showSearch = ref(true)
 const ids = ref([])
@@ -181,6 +223,10 @@ const patternOptions = ref([])
 
 // 弹窗控制
 const dialog = reactive({
+  visible: false,
+  title: ''
+})
+const detailDialog = reactive({
   visible: false,
   title: ''
 })
@@ -366,16 +412,32 @@ const handleExport = () => {
   }, `goods_${new Date().getTime()}.xlsx`)
 }
 
+/** 查看按钮操作 */
+const handleView = async (row) => {
+  detailDialog.visible = true
+  detailDialog.title = "查看商品详情"
+  const { data } = await getGoods(row.goodsId)
+  goodsDetail.value.form = { ...data }
+}
+
 /** 状态修改 */
 const handleStatusChange = async (row) => {
-  const text = row.status === "0" ? "启用" : "停用"
+  const text = row.status === "0" ? "上架" : "下架"
   try {
-    await proxy.$modal.confirm('确认要"' + text + '""' + row.goodsName + '"商品吗?')
-    await updateGoodsStatus(row)
-    proxy.$modal.msgSuccess(text + "成功")
+    await ElMessageBox.confirm(
+      `确认要${text}商品"${row.goodsCode}"吗？`,
+      "提示",
+      {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }
+    )
+    await updateGoodsStatus(row.goodsId, row.status)
+    ElMessage.success(`${text}成功`)
   } catch (error) {
     row.status = row.status === "0" ? "1" : "0"
-    console.error('状态修改失败:', error)
+    console.error("Error updating status:", error)
   }
 }
 

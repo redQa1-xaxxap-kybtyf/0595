@@ -33,7 +33,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="规格尺寸">
+          <el-form-item label="规格尺寸" prop="specId">
             <el-select v-model="form.specId" placeholder="请选择规格尺寸">
               <el-option
                 v-for="item in specOptions"
@@ -199,6 +199,9 @@ const rules = {
   ],
   categoryId: [
     { required: true, message: '商品分类不能为空', trigger: 'change' }
+  ],
+  specId: [
+    { required: true, message: '规格尺寸不能为空', trigger: 'change' }
   ],
   goodsImage: [
     { required: true, message: '商品主图不能为空', trigger: 'change' }
