@@ -1,10 +1,20 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch">
-      <el-form-item label="仓库名称" prop="warehouseName">
+      <el-form-item label="所属仓库" prop="warehouseId">
+        <el-select v-model="queryParams.warehouseId" placeholder="请选择所属仓库" clearable>
+          <el-option
+            v-for="item in warehouseOptions"
+            :key="item.warehouseId"
+            :label="item.warehouseName"
+            :value="item.warehouseId"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="货位名称" prop="locationName">
         <el-input
-          v-model="queryParams.warehouseName"
-          placeholder="请输入仓库名称"
+          v-model="queryParams.locationName"
+          placeholder="请输入货位名称"
           clearable
           @keyup.enter="handleQuery"
         />
@@ -32,7 +42,7 @@
           plain
           icon="Plus"
           @click="handleAdd"
-          v-hasPermi="['system:warehouse:add']"
+          v-hasPermi="['tile:location:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -42,7 +52,7 @@
           icon="Edit"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['system:warehouse:edit']"
+          v-hasPermi="['tile:location:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -52,7 +62,7 @@
           icon="Delete"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['system:warehouse:remove']"
+          v-hasPermi="['tile:location:remove']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -61,22 +71,22 @@
           plain
           icon="Download"
           @click="handleExport"
-          v-hasPermi="['system:warehouse:export']"
+          v-hasPermi="['tile:location:export']"
         >导出</el-button>
       </el-col>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="warehouseList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="locationList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="仓库ID" align="center" prop="warehouseId" />
-      <el-table-column label="仓库名称" align="center" prop="warehouseName" />
+      <el-table-column label="货位ID" align="center" prop="locationId" />
+      <el-table-column label="所属仓库" align="center" prop="warehouseName" />
+      <el-table-column label="货位名称" align="center" prop="locationName" />
       <el-table-column label="状态" align="center" prop="status">
         <template #default="scope">
           <dict-tag :options="sys_normal_disable" :value="scope.row.status"/>
         </template>
       </el-table-column>
-      <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template #default="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -86,22 +96,20 @@
         <template #default="scope">
           <el-button
             link
-            type="primary"
             icon="Edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['system:warehouse:edit']"
+            v-hasPermi="['tile:location:edit']"
           >修改</el-button>
           <el-button
             link
-            type="danger"
             icon="Delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['system:warehouse:remove']"
+            v-hasPermi="['tile:location:remove']"
           >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
-
+    
     <pagination
       v-show="total>0"
       :total="total"
@@ -110,16 +118,29 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改仓库对话框 -->
+    <!-- 添加或修改货位对话框 -->
     <el-dialog :title="title" v-model="open" width="500px" append-to-body>
-      <el-form ref="warehouseForm" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="仓库名称" prop="warehouseName">
-          <el-input v-model="form.warehouseName" placeholder="请输入仓库名称" />
+      <el-form ref="locationRef" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="所属仓库" prop="warehouseId">
+          <el-select v-model="form.warehouseId" placeholder="请选择所属仓库">
+            <el-option
+              v-for="item in warehouseOptions"
+              :key="item.warehouseId"
+              :label="item.warehouseName"
+              :value="item.warehouseId"
+            />
+          </el-select>
         </el-form-item>
-        <el-form-item label="状态" prop="status">
+        <el-form-item label="货位名称" prop="locationName">
+          <el-input v-model="form.locationName" placeholder="请输入货位名称" />
+        </el-form-item>
+        <el-form-item label="状态">
           <el-radio-group v-model="form.status">
-            <el-radio :value="'0'" label="正常">正常</el-radio>
-            <el-radio :value="'1'" label="停用">停用</el-radio>
+            <el-radio
+              v-for="dict in sys_normal_disable"
+              :key="dict.value"
+              :value="dict.value"
+            >{{dict.label}}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
@@ -136,64 +157,65 @@
   </div>
 </template>
 
-<script setup name="StockWarehouse">
-import { listWarehouse, getWarehouse, delWarehouse, addWarehouse, updateWarehouse } from "@/api/tile/warehouse";
-import { getCurrentInstance, ref, reactive, toRefs } from 'vue';
+<script setup name="Location">
+import { listLocation, getLocation, delLocation, addLocation, updateLocation, exportLocation } from "@/api/tile/location";
+import { listWarehouse } from "@/api/tile/warehouse";
 
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict("sys_normal_disable");
 
-// 遮罩层
-const loading = ref(true);
-// 选中数组
-const ids = ref([]);
-// 非单个禁用
-const single = ref(true);
-// 非多个禁用
-const multiple = ref(true);
-// 显示搜索条件
-const showSearch = ref(true);
-// 总条数
-const total = ref(0);
-// 仓库表格数据
-const warehouseList = ref([]);
-// 弹出层标题
-const title = ref("");
-// 是否显示弹出层
+const locationList = ref([]);
+const warehouseOptions = ref([]);
 const open = ref(false);
+const loading = ref(false);
+const showSearch = ref(true);
+const ids = ref([]);
+const single = ref(true);
+const multiple = ref(true);
+const total = ref(0);
+const title = ref("");
 
 const data = reactive({
   form: {
+    locationId: undefined,
+    locationName: undefined,
     warehouseId: undefined,
-    warehouseName: undefined,
     status: "0",
     remark: undefined
-  },
-  rules: {
-    warehouseName: [
-      { required: true, message: "仓库名称不能为空", trigger: "blur" }
-    ],
-    status: [
-      { required: true, message: "状态不能为空", trigger: "change" }
-    ]
   },
   queryParams: {
     pageNum: 1,
     pageSize: 10,
-    warehouseName: undefined,
+    locationName: undefined,
+    warehouseId: undefined,
     status: undefined
+  },
+  rules: {
+    locationName: [
+      { required: true, message: "货位名称不能为空", trigger: "blur" }
+    ],
+    warehouseId: [
+      { required: true, message: "所属仓库不能为空", trigger: "change" }
+    ]
   }
 });
 
 const { queryParams, form, rules } = toRefs(data);
 
-/** 查询仓库列表 */
+/** 查询货位列表 */
 function getList() {
   loading.value = true;
-  listWarehouse(queryParams.value).then(response => {
-    warehouseList.value = response.rows;
+  listLocation(queryParams.value).then(response => {
+    locationList.value = response.rows;
     total.value = response.total;
     loading.value = false;
+  });
+}
+
+/** 获取仓库列表 */
+function getWarehouseOptions() {
+  listWarehouse().then(response => {
+    warehouseOptions.value = response.rows;
   });
 }
 
@@ -206,17 +228,18 @@ function cancel() {
 /** 表单重置 */
 function reset() {
   form.value = {
+    locationId: undefined,
+    locationName: undefined,
     warehouseId: undefined,
-    warehouseName: undefined,
     status: "0",
     remark: undefined
   };
-  proxy.resetForm("warehouseForm");
+  proxy.resetForm("locationRef");
 }
 
 /** 搜索按钮操作 */
 function handleQuery() {
-  queryParams.value.pageNum = 1;
+  queryParams.pageNum = 1;
   getList();
 }
 
@@ -226,36 +249,44 @@ function resetQuery() {
   handleQuery();
 }
 
+/** 多选框选中数据 */
+function handleSelectionChange(selection) {
+  ids.value = selection.map(item => item.locationId);
+  single.value = selection.length !== 1;
+  multiple.value = !selection.length;
+}
+
 /** 新增按钮操作 */
 function handleAdd() {
   reset();
+  getWarehouseOptions();
   open.value = true;
-  title.value = "添加仓库";
+  title.value = "添加货位";
 }
 
 /** 修改按钮操作 */
 function handleUpdate(row) {
   reset();
-  const warehouseId = row.warehouseId || ids.value;
-  getWarehouse(warehouseId).then(response => {
-    Object.assign(form.value, response.data);
+  const locationId = row.locationId || ids.value[0];
+  getLocation(locationId).then(response => {
+    form.value = response.data;
     open.value = true;
-    title.value = "修改仓库";
+    title.value = "修改货位";
   });
 }
 
 /** 提交按钮 */
 function submitForm() {
-  proxy.$refs["warehouseForm"].validate(valid => {
+  proxy.$refs["locationRef"].validate(valid => {
     if (valid) {
-      if (form.value.warehouseId != undefined) {
-        updateWarehouse(form.value).then(response => {
+      if (form.value.locationId != null) {
+        updateLocation(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功");
           open.value = false;
           getList();
         });
       } else {
-        addWarehouse(form.value).then(response => {
+        addLocation(form.value).then(response => {
           proxy.$modal.msgSuccess("新增成功");
           open.value = false;
           getList();
@@ -267,38 +298,23 @@ function submitForm() {
 
 /** 删除按钮操作 */
 function handleDelete(row) {
-  const warehouseIds = row.warehouseId || ids.value;
-  const warehouseName = row.warehouseName || warehouseList.value.find(item => item.warehouseId === warehouseIds)?.warehouseName;
-  proxy.$modal.confirm('是否确认删除仓库"' + warehouseName + '"？').then(function() {
-    return delWarehouse(warehouseIds);
+  const locationIds = row.locationId || ids.value;
+  proxy.$modal.confirm('是否确认删除货位编号为"' + locationIds + '"的数据项？').then(function() {
+    return delLocation(locationIds);
   }).then(() => {
     getList();
     proxy.$modal.msgSuccess("删除成功");
-  });
+  }).catch(() => {});
 }
 
 /** 导出按钮操作 */
 function handleExport() {
-  proxy.download('system/warehouse/export', {
+  proxy.$download('tile/location/export', {
     ...queryParams.value
-  }, `warehouse_${new Date().getTime()}.xlsx`);
-}
-
-/** 多选框选中数据 */
-function handleSelectionChange(selection) {
-  ids.value = selection.map(item => item.warehouseId);
-  single.value = selection.length !== 1;
-  multiple.value = !selection.length;
+  }, `location_${new Date().getTime()}.xlsx`);
 }
 
 onMounted(() => {
   getList();
 });
 </script>
-
-<style scoped>
-.dialog-footer {
-  text-align: center;
-  padding-top: 20px;
-}
-</style>

@@ -21,18 +21,18 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="仓位" prop="positionId">
-        <el-select v-model="form.positionId" placeholder="请选择仓位" clearable>
+      <el-form-item label="货位" prop="locationId">
+        <el-select v-model="form.locationId" placeholder="请选择货位" clearable>
           <el-option
-            v-for="item in positionList"
-            :key="item.positionId"
-            :label="item.positionName"
-            :value="item.positionId"
+            v-for="item in locationList"
+            :key="item.locationId"
+            :label="item.locationName"
+            :value="item.locationId"
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="库存数量" prop="quantity">
-        <el-input-number v-model="form.quantity" :min="0" controls-position="right" placeholder="请输入库存数量" />
+      <el-form-item label="数量" prop="quantity">
+        <el-input-number v-model="form.quantity" :min="0" controls-position="right" placeholder="请输入数量" />
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-radio-group v-model="form.status">
@@ -59,7 +59,8 @@
 <script setup name="StockDialog">
 import { getStock, addStock, updateStock } from "@/api/tile/stock";
 import { listGoods } from "@/api/tile/goods";
-import { listWarehouse, listWarehousePosition } from "@/api/tile/warehouse";
+import { listWarehouse } from "@/api/tile/warehouse";
+import { listLocation } from "@/api/tile/location";
 
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict("sys_normal_disable");
@@ -69,16 +70,14 @@ const loading = ref(true);
 const title = ref("");
 const goodsList = ref([]);
 const warehouseList = ref([]);
-const positionList = ref([]);
-
-const emit = defineEmits(["refresh"]);
+const locationList = ref([]);
 
 const data = reactive({
   form: {
     stockId: undefined,
     goodsId: undefined,
     warehouseId: undefined,
-    positionId: undefined,
+    locationId: undefined,
     quantity: 0,
     status: "0",
     remark: undefined
@@ -90,43 +89,40 @@ const data = reactive({
     warehouseId: [
       { required: true, message: "仓库不能为空", trigger: "change" }
     ],
-    positionId: [
-      { required: true, message: "仓位不能为空", trigger: "change" }
+    locationId: [
+      { required: true, message: "货位不能为空", trigger: "change" }
     ],
     quantity: [
-      { required: true, message: "库存数量不能为空", trigger: "blur" }
-    ],
-    status: [
-      { required: true, message: "状态不能为空", trigger: "change" }
+      { required: true, message: "数量不能为空", trigger: "blur" }
     ]
   }
 });
 
 const { form, rules } = toRefs(data);
 
-/** 获取商品列表 */
+/** 查询商品列表 */
 function getGoodsList() {
   listGoods().then(response => {
     goodsList.value = response.rows;
   });
 }
 
-/** 获取仓库列表 */
+/** 查询仓库列表 */
 function getWarehouseList() {
   listWarehouse().then(response => {
     warehouseList.value = response.rows;
   });
 }
 
-/** 仓库选择改变时获取仓位列表 */
+/** 仓库选择改变时获取货位列表 */
 function handleWarehouseChange(warehouseId) {
   if (!warehouseId) {
-    positionList.value = [];
-    form.value.positionId = undefined;
+    locationList.value = [];
+    form.value.locationId = undefined;
     return;
   }
-  listWarehousePosition({ warehouseId: warehouseId }).then(response => {
-    positionList.value = response.rows;
+  listLocation({ warehouseId: warehouseId }).then(response => {
+    locationList.value = response.rows;
   });
 }
 
@@ -142,34 +138,36 @@ function reset() {
     stockId: undefined,
     goodsId: undefined,
     warehouseId: undefined,
-    positionId: undefined,
+    locationId: undefined,
     quantity: 0,
     status: "0",
     remark: undefined
   };
-  positionList.value = [];
   proxy.resetForm("stockFormRef");
 }
 
 /** 新增按钮操作 */
 function handleAdd() {
   reset();
+  open.value = true;
+  title.value = "添加库存";
   getGoodsList();
   getWarehouseList();
-  open.value = true;
-  title.value = "添加库存管理";
 }
 
 /** 修改按钮操作 */
 function handleUpdate(row) {
   reset();
-  getGoodsList();
-  getWarehouseList();
   const stockId = row.stockId;
   getStock(stockId).then(response => {
     form.value = response.data;
     open.value = true;
-    title.value = "修改库存管理";
+    title.value = "修改库存";
+    getGoodsList();
+    getWarehouseList();
+    if (form.value.warehouseId) {
+      handleWarehouseChange(form.value.warehouseId);
+    }
   });
 }
 
@@ -181,13 +179,13 @@ function submitForm() {
         updateStock(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功");
           open.value = false;
-          emit("refresh");
+          proxy.$emit('refresh');
         });
       } else {
         addStock(form.value).then(response => {
           proxy.$modal.msgSuccess("新增成功");
           open.value = false;
-          emit("refresh");
+          proxy.$emit('refresh');
         });
       }
     }

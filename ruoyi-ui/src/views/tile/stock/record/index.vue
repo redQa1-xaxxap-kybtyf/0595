@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch">
       <el-form-item label="操作类型" prop="operType">
-        <el-select v-model="queryParams.operType" placeholder="操作类型" clearable style="width: 200px">
+        <el-select v-model="queryParams.operType" id="operType" placeholder="操作类型" clearable style="width: 200px">
           <el-option
             v-for="dict in tile_stock_oper_type"
             :key="dict.value"
@@ -12,7 +12,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="商品" prop="goodsId">
-        <el-select v-model="queryParams.goodsId" placeholder="商品" clearable style="width: 200px">
+        <el-select v-model="queryParams.goodsId" id="goodsId" placeholder="商品" clearable style="width: 200px">
           <el-option
             v-for="item in goodsOptions"
             :key="item.goodsId"
@@ -22,7 +22,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="仓库" prop="warehouseId">
-        <el-select v-model="queryParams.warehouseId" placeholder="仓库" clearable style="width: 200px">
+        <el-select v-model="queryParams.warehouseId" id="warehouseId" placeholder="仓库" clearable style="width: 200px">
           <el-option
             v-for="item in warehouseOptions"
             :key="item.warehouseId"
@@ -32,7 +32,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="单据类型" prop="sourceType">
-        <el-select v-model="queryParams.sourceType" placeholder="单据类型" clearable style="width: 200px">
+        <el-select v-model="queryParams.sourceType" id="sourceType" placeholder="单据类型" clearable style="width: 200px">
           <el-option
             v-for="dict in tile_stock_source_type"
             :key="dict.value"
@@ -44,6 +44,7 @@
       <el-form-item label="单据编号" prop="sourceCode">
         <el-input
           v-model="queryParams.sourceCode"
+          id="sourceCode"
           placeholder="请输入单据编号"
           clearable
           style="width: 200px"

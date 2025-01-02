@@ -1,36 +1,24 @@
 package com.ruoyi.system.tile.service.impl;
 
 import java.util.List;
+import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.system.tile.mapper.TileWarehouseMapper;
 import com.ruoyi.system.tile.domain.TileWarehouse;
 import com.ruoyi.system.tile.service.ITileWarehouseService;
-import com.ruoyi.common.utils.DateUtils;
 
 /**
  * 仓库Service业务层处理
  * 
  * @author ruoyi
- * @date 2025-01-01
+ * @date 2024-01-02
  */
 @Service
 public class TileWarehouseServiceImpl implements ITileWarehouseService 
 {
     @Autowired
     private TileWarehouseMapper tileWarehouseMapper;
-
-    /**
-     * 查询仓库
-     * 
-     * @param warehouseId 仓库主键
-     * @return 仓库
-     */
-    @Override
-    public TileWarehouse selectTileWarehouseByWarehouseId(Long warehouseId)
-    {
-        return tileWarehouseMapper.selectTileWarehouseByWarehouseId(warehouseId);
-    }
 
     /**
      * 查询仓库列表
@@ -45,6 +33,18 @@ public class TileWarehouseServiceImpl implements ITileWarehouseService
     }
 
     /**
+     * 查询仓库
+     * 
+     * @param warehouseId 仓库主键
+     * @return 仓库
+     */
+    @Override
+    public TileWarehouse selectTileWarehouseByWarehouseId(Long warehouseId)
+    {
+        return tileWarehouseMapper.selectTileWarehouseByWarehouseId(warehouseId);
+    }
+
+    /**
      * 新增仓库
      * 
      * @param tileWarehouse 仓库
@@ -53,7 +53,7 @@ public class TileWarehouseServiceImpl implements ITileWarehouseService
     @Override
     public int insertTileWarehouse(TileWarehouse tileWarehouse)
     {
-        tileWarehouse.setCreateTime(DateUtils.getNowDate());
+        tileWarehouse.setCreateTime(new Date());
         return tileWarehouseMapper.insertTileWarehouse(tileWarehouse);
     }
 
@@ -66,7 +66,6 @@ public class TileWarehouseServiceImpl implements ITileWarehouseService
     @Override
     public int updateTileWarehouse(TileWarehouse tileWarehouse)
     {
-        tileWarehouse.setUpdateTime(DateUtils.getNowDate());
         return tileWarehouseMapper.updateTileWarehouse(tileWarehouse);
     }
 

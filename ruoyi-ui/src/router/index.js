@@ -207,6 +207,12 @@ export const dynamicRoutes = [
         component: () => import('@/views/tile/stock/warehouse/index'),
         name: 'TileStockWarehouse',
         meta: { title: '仓库管理', icon: 'form' }
+      },
+      {
+        path: 'stock/location',
+        component: () => import('@/views/tile/stock/location/index'),
+        name: 'TileStockLocation',
+        meta: { title: '货位管理', icon: 'form' }
       }
     ]
   }

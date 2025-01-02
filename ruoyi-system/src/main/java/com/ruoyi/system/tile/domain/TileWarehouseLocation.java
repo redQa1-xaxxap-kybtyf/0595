@@ -1,31 +1,34 @@
 package com.ruoyi.system.tile.domain;
 
-import java.util.List;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
 
 /**
- * 仓库对象 tile_warehouse
+ * 货位对象 tile_warehouse_location
  * 
  * @author ruoyi
  * @date 2024-01-02
  */
-public class TileWarehouse extends BaseEntity
+public class TileWarehouseLocation extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
+    /** 货位ID */
+    private Long locationId;
+
     /** 仓库ID */
+    @Excel(name = "仓库ID")
     private Long warehouseId;
 
     /** 仓库名称 */
     @Excel(name = "仓库名称")
     private String warehouseName;
 
-    /** 仓库地址 */
-    @Excel(name = "仓库地址")
-    private String address;
+    /** 货位名称 */
+    @Excel(name = "货位名称")
+    private String locationName;
 
     /** 状态（0正常 1停用） */
     @Excel(name = "状态", readConverterExp = "0=正常,1=停用")
@@ -34,8 +37,15 @@ public class TileWarehouse extends BaseEntity
     /** 删除标志（0代表存在 2代表删除） */
     private String delFlag;
 
-    /** 货位列表 - 仅用于查询显示，不参与新增和修改操作 */
-    private List<TileWarehouseLocation> locations;
+    public void setLocationId(Long locationId) 
+    {
+        this.locationId = locationId;
+    }
+
+    public Long getLocationId() 
+    {
+        return locationId;
+    }
 
     public void setWarehouseId(Long warehouseId) 
     {
@@ -57,14 +67,14 @@ public class TileWarehouse extends BaseEntity
         return warehouseName;
     }
 
-    public void setAddress(String address) 
+    public void setLocationName(String locationName) 
     {
-        this.address = address;
+        this.locationName = locationName;
     }
 
-    public String getAddress() 
+    public String getLocationName() 
     {
-        return address;
+        return locationName;
     }
 
     public void setStatus(String status) 
@@ -87,20 +97,13 @@ public class TileWarehouse extends BaseEntity
         return delFlag;
     }
 
-    public List<TileWarehouseLocation> getLocations() {
-        return locations;
-    }
-
-    public void setLocations(List<TileWarehouseLocation> locations) {
-        this.locations = locations;
-    }
-
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
+            .append("locationId", getLocationId())
             .append("warehouseId", getWarehouseId())
             .append("warehouseName", getWarehouseName())
-            .append("address", getAddress())
+            .append("locationName", getLocationName())
             .append("status", getStatus())
             .append("delFlag", getDelFlag())
             .append("createBy", getCreateBy())
@@ -108,7 +111,6 @@ public class TileWarehouse extends BaseEntity
             .append("updateBy", getUpdateBy())
             .append("updateTime", getUpdateTime())
             .append("remark", getRemark())
-            .append("locations", getLocations())
             .toString();
     }
 }

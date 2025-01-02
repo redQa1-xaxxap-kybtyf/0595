@@ -144,12 +144,32 @@
     <el-dialog :title="title" v-model="open" width="800px" append-to-body>
       <el-form ref="stockInRef" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="仓库" prop="warehouseId">
-          <el-select v-model="form.warehouseId" placeholder="请选择仓库">
+          <el-select v-model="form.warehouseId" placeholder="请选择仓库" @change="handleWarehouseChange">
             <el-option
               v-for="item in warehouseOptions"
               :key="item.warehouseId"
               :label="item.warehouseName"
               :value="item.warehouseId"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="供应商" prop="supplierId">
+          <el-select v-model="form.supplierId" placeholder="请选择供应商">
+            <el-option
+              v-for="item in supplierOptions"
+              :key="item.supplierId"
+              :label="item.supplierName"
+              :value="item.supplierId"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="货位" prop="locationId" v-if="locationOptions.length > 0">
+          <el-select v-model="form.locationId" placeholder="请选择货位">
+            <el-option
+              v-for="item in locationOptions"
+              :key="item.locationId"
+              :label="item.locationName"
+              :value="item.locationId"
             />
           </el-select>
         </el-form-item>
@@ -202,6 +222,8 @@
 import { listStockIn, getStockIn, delStockIn, addStockIn, updateStockIn, submitStockIn, cancelStockIn } from "@/api/tile/stock";
 import { listWarehouse } from "@/api/tile/warehouse";
 import { listGoods } from "@/api/tile/goods";
+import { listLocationByWarehouseId } from "@/api/tile/location";
+import { listSupplier } from "@/api/tile/supplier";
 
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict("sys_normal_disable");
@@ -218,12 +240,16 @@ const title = ref("");
 const dateRange = ref([]);
 const warehouseOptions = ref([]);
 const goodsOptions = ref([]);
+const locationOptions = ref([]);
+const supplierOptions = ref([]);
 
 const data = reactive({
   form: {
     inId: undefined,
     inCode: undefined,
     warehouseId: undefined,
+    locationId: undefined,
+    supplierId: undefined,
     status: "1",
     remark: undefined,
     details: []
@@ -238,6 +264,9 @@ const data = reactive({
   rules: {
     warehouseId: [
       { required: true, message: "仓库不能为空", trigger: "blur" }
+    ],
+    supplierId: [
+      { required: true, message: "供应商不能为空", trigger: "blur" }
     ]
   }
 });
@@ -268,6 +297,13 @@ function getGoodsList() {
   });
 }
 
+/** 查询供应商列表 */
+function getSupplierList() {
+  listSupplier().then(response => {
+    supplierOptions.value = response.rows;
+  });
+}
+
 /** 取消按钮 */
 function cancel() {
   open.value = false;
@@ -280,10 +316,13 @@ function reset() {
     inId: undefined,
     inCode: undefined,
     warehouseId: undefined,
+    locationId: undefined,
+    supplierId: undefined,
     status: "1",
     remark: undefined,
     details: []
   };
+  locationOptions.value = [];
   proxy.resetForm("stockInRef");
 }
 
@@ -328,7 +367,7 @@ function handleUpdate(row) {
 function submitForm() {
   proxy.$refs["stockInRef"].validate(valid => {
     if (valid) {
-      if (form.value.inId != undefined) {
+      if (form.value.inId != null) {
         updateStockIn(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功");
           open.value = false;
@@ -402,7 +441,28 @@ function handleDetail(row) {
   proxy.$router.push({ path: '/tile/stock/in/detail', query: { inId: inId }});
 }
 
+/** 仓库选择改变事件 */
+function handleWarehouseChange(value) {
+  // 清空货位选择
+  form.value.locationId = undefined;
+  locationOptions.value = [];
+  
+  // 如果选择了仓库，则获取对应的货位列表
+  if (value) {
+    // 确保 value 是数字类型
+    const warehouseId = parseInt(value);
+    if (!isNaN(warehouseId)) {
+      listLocationByWarehouseId(warehouseId).then(response => {
+        locationOptions.value = response.data || [];
+      }).catch(error => {
+        console.error("获取货位列表失败:", error);
+      });
+    }
+  }
+}
+
 getWarehouseList();
 getGoodsList();
+getSupplierList();
 getList();
 </script>

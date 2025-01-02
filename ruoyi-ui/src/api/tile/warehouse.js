@@ -43,11 +43,13 @@ export function delWarehouse(warehouseId) {
   })
 }
 
-// 导出仓库
-export function exportWarehouse(query) {
+// 查询仓库货位列表
+export function listWarehousePosition(warehouseId) {
   return request({
-    url: '/tile/warehouse/export',
+    url: '/tile/location/list',
     method: 'get',
-    params: query
+    params: {
+      warehouseId: warehouseId
+    }
   })
 }

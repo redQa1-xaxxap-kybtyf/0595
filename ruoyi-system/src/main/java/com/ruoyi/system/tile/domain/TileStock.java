@@ -41,6 +41,14 @@ public class TileStock extends BaseEntity
     @Excel(name = "库存数量")
     private Long quantity;
 
+    /** 最小库存 */
+    @Excel(name = "最小库存")
+    private Long minStock;
+
+    /** 最大库存 */
+    @Excel(name = "最大库存")
+    private Long maxStock;
+
     /** 状态（0正常 1停用） */
     @Excel(name = "状态", readConverterExp = "0=正常,1=停用")
     private String status;
@@ -130,6 +138,26 @@ public class TileStock extends BaseEntity
         return quantity;
     }
 
+    public Long getMinStock() 
+    {
+        return minStock;
+    }
+
+    public void setMinStock(Long minStock) 
+    {
+        this.minStock = minStock;
+    }
+
+    public Long getMaxStock() 
+    {
+        return maxStock;
+    }
+
+    public void setMaxStock(Long maxStock) 
+    {
+        this.maxStock = maxStock;
+    }
+
     public void setStatus(String status) 
     {
         this.status = status;
@@ -188,6 +216,8 @@ public class TileStock extends BaseEntity
             .append("warehouseId", getWarehouseId())
             .append("positionId", getPositionId())
             .append("quantity", getQuantity())
+            .append("minStock", getMinStock())
+            .append("maxStock", getMaxStock())
             .append("status", getStatus())
             .append("delFlag", getDelFlag())
             .append("createBy", getCreateBy())

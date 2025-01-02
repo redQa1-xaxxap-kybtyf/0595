@@ -7,7 +7,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <resultMap type="com.ruoyi.system.tile.domain.TileWarehouse" id="TileWarehouseResult">
         <result property="warehouseId"    column="warehouse_id"    />
         <result property="warehouseName"  column="warehouse_name"  />
-        <result property="locations"      column="locations"       />
         <result property="address"        column="address"         />
         <result property="status"         column="status"         />
         <result property="delFlag"        column="del_flag"       />
@@ -16,33 +15,39 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateBy"       column="update_by"      />
         <result property="updateTime"     column="update_time"    />
         <result property="remark"         column="remark"         />
+        <collection property="locations" ofType="com.ruoyi.system.tile.domain.TileWarehouseLocation">
+            <result property="locationId"    column="location_id"    />
+            <result property="locationName"  column="location_name"  />
+            <result property="status"        column="location_status"/>
+        </collection>
     </resultMap>
 
     <sql id="selectTileWarehouseVo">
-        select warehouse_id, warehouse_name, locations, address, status, del_flag, create_by, create_time, update_by, update_time, remark 
-        from tile_warehouse
+        select w.warehouse_id, w.warehouse_name, w.address, w.status, w.del_flag, 
+        w.create_by, w.create_time, w.update_by, w.update_time, w.remark,
+        l.location_id, l.location_name, l.status as location_status
+        from tile_warehouse w
+        left join tile_warehouse_location l on l.warehouse_id = w.warehouse_id and l.del_flag = '0'
     </sql>
 
     <select id="selectTileWarehouseList" parameterType="com.ruoyi.system.tile.domain.TileWarehouse" resultMap="TileWarehouseResult">
         <include refid="selectTileWarehouseVo"/>
         <where>  
-            <if test="warehouseName != null  and warehouseName != ''"> and warehouse_name like concat('%', #{warehouseName}, '%')</if>
-            <if test="locations != null  and locations != ''"> and locations like concat('%', #{locations}, '%')</if>
-            <if test="status != null  and status != ''"> and status = #{status}</if>
-            and del_flag = '0'
+            <if test="warehouseName != null  and warehouseName != ''"> and w.warehouse_name like concat('%', #{warehouseName}, '%')</if>
+            <if test="status != null  and status != ''"> and w.status = #{status}</if>
+            and w.del_flag = '0'
         </where>
     </select>
     
     <select id="selectTileWarehouseByWarehouseId" parameterType="Long" resultMap="TileWarehouseResult">
         <include refid="selectTileWarehouseVo"/>
-        where warehouse_id = #{warehouseId} and del_flag = '0'
+        where w.warehouse_id = #{warehouseId} and w.del_flag = '0'
     </select>
         
     <insert id="insertTileWarehouse" parameterType="com.ruoyi.system.tile.domain.TileWarehouse" useGeneratedKeys="true" keyProperty="warehouseId">
         insert into tile_warehouse
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="warehouseName != null">warehouse_name,</if>
-            <if test="locations != null">locations,</if>
             <if test="address != null">address,</if>
             <if test="status != null">status,</if>
             <if test="delFlag != null">del_flag,</if>
@@ -54,7 +59,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="warehouseName != null">#{warehouseName},</if>
-            <if test="locations != null">#{locations},</if>
             <if test="address != null">#{address},</if>
             <if test="status != null">#{status},</if>
             <if test="delFlag != null">#{delFlag},</if>
@@ -70,7 +74,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         update tile_warehouse
         <trim prefix="SET" suffixOverrides=",">
             <if test="warehouseName != null">warehouse_name = #{warehouseName},</if>
-            <if test="locations != null">locations = #{locations},</if>
             <if test="address != null">address = #{address},</if>
             <if test="status != null">status = #{status},</if>
             <if test="delFlag != null">del_flag = #{delFlag},</if>
