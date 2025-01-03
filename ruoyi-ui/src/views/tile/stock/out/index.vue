@@ -182,6 +182,7 @@
                 />
               </template>
             </el-table-column>
+            <el-table-column label="货位" prop="locationName" />
             <el-table-column label="操作" align="center" width="150">
               <template #default="scope">
                 <el-button
@@ -200,6 +201,16 @@
             </el-table-column>
           </el-table>
         </el-form-item>
+        <el-form-item label="货位" prop="locationId">
+          <el-select v-model="form.locationId" placeholder="请选择货位" :disabled="form.status !== '1'">
+            <el-option
+              v-for="item in locationOptions"
+              :key="item.locationId"
+              :label="item.locationName"
+              :value="item.locationId"
+            />
+          </el-select>
+        </el-form-item>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -215,6 +226,7 @@
 import { listStockOut, getStockOut, addStockOut, updateStockOut, delStockOut, submitStockOut, cancelStockOut } from "@/api/tile/stock";
 import { listWarehouse } from "@/api/tile/warehouse";
 import { listGoods } from "@/api/tile/goods";
+import { listLocation } from "@/api/tile/location";
 
 import { ref, reactive, onMounted } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
@@ -246,6 +258,8 @@ const dateRange = ref([]);
 const warehouseOptions = ref([]);
 // 商品选项列表
 const goodsOptions = ref([]);
+// 货位选项列表
+const locationOptions = ref([]);
 
 // 查询参数
 const queryParams = ref({
@@ -265,7 +279,8 @@ const form = ref({
   remark: undefined,
   details: [{
     goodsId: undefined,
-    quantity: 1
+    quantity: 1,
+    locationName: undefined
   }]
 });
 
@@ -300,6 +315,13 @@ function getGoodsList() {
   });
 }
 
+/** 查询货位列表 */
+function getLocationList() {
+  listLocation().then(response => {
+    locationOptions.value = response.rows;
+  });
+}
+
 /** 取消按钮 */
 function cancel() {
   open.value = false;
@@ -316,7 +338,8 @@ function reset() {
     remark: undefined,
     details: [{
       goodsId: undefined,
-      quantity: 1
+      quantity: 1,
+      locationName: undefined
     }]
   };
   proxy.resetForm("stockOutRef");
@@ -438,7 +461,8 @@ function handleExport() {
 function handleAddDetail() {
   form.value.details.push({
     goodsId: undefined,
-    quantity: 1
+    quantity: 1,
+    locationName: undefined
   });
 }
 
@@ -458,5 +482,6 @@ onMounted(() => {
   getList();
   getWarehouseList();
   getGoodsList();
+  getLocationList();
 });
 </script>

@@ -31,12 +31,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="surfaceName"   column="surface_name"   />
         <result property="usageName"     column="usage_name"     />
         <result property="patternName"   column="pattern_name"   />
+        <result property="piecesPerBox"  column="pieces_per_box" />
+        <result property="weightPerBox"  column="weight_per_box" />
     </resultMap>
 
     <sql id="selectTileGoodsVo">
         SELECT g.goods_id, g.goods_code, g.goods_name, g.category_id, g.spec_id, g.material_id, g.surface_id, g.usage_id, g.pattern_id,
                g.goods_image, g.goods_images, g.goods_desc, g.sales, g.status, g.del_flag, g.create_by, g.create_time,
-               g.update_by, g.update_time, g.remark,
+               g.update_by, g.update_time, g.remark, g.pieces_per_box, g.weight_per_box,
                c.category_name, s.spec_name, m.material_name, sf.surface_name, u.usage_name, p.pattern_name
         FROM tile_goods g
         LEFT JOIN tile_category c ON g.category_id = c.category_id
@@ -114,6 +116,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">update_by,</if>
             <if test="updateTime != null">update_time,</if>
             <if test="remark != null">remark,</if>
+            <if test="piecesPerBox != null">pieces_per_box,</if>
+            <if test="weightPerBox != null">weight_per_box,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="goodsCode != null">#{goodsCode},</if>
@@ -135,6 +139,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">#{updateBy},</if>
             <if test="updateTime != null">#{updateTime},</if>
             <if test="remark != null">#{remark},</if>
+            <if test="piecesPerBox != null">#{piecesPerBox},</if>
+            <if test="weightPerBox != null">#{weightPerBox},</if>
          </trim>
     </insert>
 
@@ -158,6 +164,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">update_by = #{updateBy},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
             <if test="remark != null">remark = #{remark},</if>
+            <if test="piecesPerBox != null">pieces_per_box = #{piecesPerBox},</if>
+            <if test="weightPerBox != null">weight_per_box = #{weightPerBox},</if>
         </trim>
         where goods_id = #{goodsId}
     </update>

@@ -28,6 +28,13 @@ public class TileStockOutDetail extends BaseEntity
     @Excel(name = "商品")
     private String goodsName;
 
+    /** 货位ID */
+    @Excel(name = "货位ID")
+    private Long locationId;
+
+    /** 货位名称 */
+    private String locationName;
+
     /** 数量 */
     @Excel(name = "数量")
     private Integer quantity;
@@ -72,6 +79,26 @@ public class TileStockOutDetail extends BaseEntity
         return goodsName;
     }
 
+    public void setLocationId(Long locationId) 
+    {
+        this.locationId = locationId;
+    }
+
+    public Long getLocationId() 
+    {
+        return locationId;
+    }
+
+    public void setLocationName(String locationName) 
+    {
+        this.locationName = locationName;
+    }
+
+    public String getLocationName() 
+    {
+        return locationName;
+    }
+
     public void setQuantity(Integer quantity) 
     {
         this.quantity = quantity;
@@ -89,6 +116,8 @@ public class TileStockOutDetail extends BaseEntity
             .append("outId", getOutId())
             .append("goodsId", getGoodsId())
             .append("goodsName", getGoodsName())
+            .append("locationId", getLocationId())
+            .append("locationName", getLocationName())
             .append("quantity", getQuantity())
             .toString();
     }

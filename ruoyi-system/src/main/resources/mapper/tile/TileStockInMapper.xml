@@ -5,40 +5,50 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="com.ruoyi.system.tile.mapper.TileStockInMapper">
     
     <resultMap type="TileStockIn" id="TileStockInResult">
-        <result property="inId"        column="in_id"        />
-        <result property="inCode"      column="in_code"      />
-        <result property="warehouseId" column="warehouse_id" />
-        <result property="supplierId"  column="supplier_id"  />
-        <result property="inType"      column="in_type"      />
-        <result property="status"      column="status"       />
-        <result property="totalAmount" column="total_amount" />
-        <result property="createBy"    column="create_by"    />
-        <result property="createTime"  column="create_time"  />
-        <result property="updateBy"    column="update_by"    />
-        <result property="updateTime"  column="update_time"  />
-        <result property="remark"      column="remark"       />
+        <result property="inId"          column="in_id"          />
+        <result property="inCode"        column="in_code"        />
+        <result property="warehouseId"   column="warehouse_id"   />
+        <result property="warehouseName" column="warehouse_name" />
+        <result property="supplierId"    column="supplier_id"    />
+        <result property="supplierName"  column="supplier_name"  />
+        <result property="customerId"    column="customer_id"    />
+        <result property="customerName"  column="customer_name"  />
+        <result property="inType"        column="in_type"        />
+        <result property="status"        column="status"         />
+        <result property="totalAmount"   column="total_amount"   />
+        <result property="createBy"      column="create_by"      />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"      column="update_by"      />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"        column="remark"         />
     </resultMap>
 
     <sql id="selectTileStockInVo">
-        select in_id, in_code, warehouse_id, supplier_id, in_type, status, total_amount, create_by, create_time, update_by, update_time, remark
-        from tile_stock_in
+        select i.in_id, i.in_code, i.warehouse_id, w.warehouse_name, 
+               i.supplier_id, s.supplier_name, i.customer_id, c.customer_name,
+               i.in_type, i.status, i.total_amount, 
+               i.create_by, i.create_time, i.update_by, i.update_time, i.remark
+        from tile_stock_in i
+        left join tile_warehouse w on w.warehouse_id = i.warehouse_id
+        left join tile_supplier s on s.supplier_id = i.supplier_id
+        left join tile_customer c on c.customer_id = i.customer_id
     </sql>
 
     <select id="selectTileStockInList" parameterType="TileStockIn" resultMap="TileStockInResult">
         <include refid="selectTileStockInVo"/>
         <where>  
-            <if test="inCode != null  and inCode != ''"> and in_code = #{inCode}</if>
-            <if test="warehouseId != null "> and warehouse_id = #{warehouseId}</if>
-            <if test="supplierId != null "> and supplier_id = #{supplierId}</if>
-            <if test="inType != null  and inType != ''"> and in_type = #{inType}</if>
-            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="inCode != null  and inCode != ''"> and i.in_code = #{inCode}</if>
+            <if test="warehouseId != null "> and i.warehouse_id = #{warehouseId}</if>
+            <if test="supplierId != null "> and i.supplier_id = #{supplierId}</if>
+            <if test="inType != null  and inType != ''"> and i.in_type = #{inType}</if>
+            <if test="status != null  and status != ''"> and i.status = #{status}</if>
         </where>
-        order by create_time desc
+        order by i.create_time desc
     </select>
     
     <select id="selectTileStockInByInId" parameterType="Long" resultMap="TileStockInResult">
         <include refid="selectTileStockInVo"/>
-        where in_id = #{inId}
+        where i.in_id = #{inId}
     </select>
         
     <insert id="insertTileStockIn" parameterType="TileStockIn" useGeneratedKeys="true" keyProperty="inId">
@@ -47,6 +57,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="inCode != null">in_code,</if>
             <if test="warehouseId != null">warehouse_id,</if>
             <if test="supplierId != null">supplier_id,</if>
+            <if test="customerId != null">customer_id,</if>
             <if test="inType != null">in_type,</if>
             <if test="status != null">status,</if>
             <if test="totalAmount != null">total_amount,</if>
@@ -60,6 +71,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="inCode != null">#{inCode},</if>
             <if test="warehouseId != null">#{warehouseId},</if>
             <if test="supplierId != null">#{supplierId},</if>
+            <if test="customerId != null">#{customerId},</if>
             <if test="inType != null">#{inType},</if>
             <if test="status != null">#{status},</if>
             <if test="totalAmount != null">#{totalAmount},</if>
@@ -77,6 +89,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="inCode != null">in_code = #{inCode},</if>
             <if test="warehouseId != null">warehouse_id = #{warehouseId},</if>
             <if test="supplierId != null">supplier_id = #{supplierId},</if>
+            <if test="customerId != null">customer_id = #{customerId},</if>
             <if test="inType != null">in_type = #{inType},</if>
             <if test="status != null">status = #{status},</if>
             <if test="totalAmount != null">total_amount = #{totalAmount},</if>

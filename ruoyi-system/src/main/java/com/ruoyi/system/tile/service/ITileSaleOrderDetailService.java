@@ -21,18 +21,18 @@ public interface ITileSaleOrderDetailService
     /**
      * 查询销售订单明细列表
      * 
-     * @param tileSaleOrderDetail 销售订单明细
-     * @return 销售订单明细集合
-     */
-    public List<TileSaleOrderDetail> selectTileSaleOrderDetailList(TileSaleOrderDetail tileSaleOrderDetail);
-
-    /**
-     * 根据订单ID查询明细
-     * 
      * @param orderId 订单ID
      * @return 销售订单明细集合
      */
     public List<TileSaleOrderDetail> selectTileSaleOrderDetailByOrderId(Long orderId);
+
+    /**
+     * 查询销售订单明细列表
+     * 
+     * @param tileSaleOrderDetail 销售订单明细
+     * @return 销售订单明细集合
+     */
+    public List<TileSaleOrderDetail> selectTileSaleOrderDetailList(TileSaleOrderDetail tileSaleOrderDetail);
 
     /**
      * 新增销售订单明细
@@ -41,14 +41,6 @@ public interface ITileSaleOrderDetailService
      * @return 结果
      */
     public int insertTileSaleOrderDetail(TileSaleOrderDetail tileSaleOrderDetail);
-
-    /**
-     * 批量新增销售订单明细
-     * 
-     * @param tileSaleOrderDetails 销售订单明细列表
-     * @return 结果
-     */
-    public int insertTileSaleOrderDetails(List<TileSaleOrderDetail> tileSaleOrderDetails);
 
     /**
      * 修改销售订单明细
@@ -75,10 +67,18 @@ public interface ITileSaleOrderDetailService
     public int deleteTileSaleOrderDetailByDetailId(Long detailId);
 
     /**
-     * 通过订单ID删除销售订单明细
+     * 删除销售订单明细信息
      * 
-     * @param orderId 订单ID
+     * @param orderId 销售订单主键
      * @return 结果
      */
     public int deleteTileSaleOrderDetailByOrderId(Long orderId);
+
+    /**
+     * 批量新增销售订单明细
+     * 
+     * @param tileSaleOrderDetails 销售订单明细列表
+     * @return 结果
+     */
+    public int batchInsertTileSaleOrderDetail(List<TileSaleOrderDetail> tileSaleOrderDetails);
 }

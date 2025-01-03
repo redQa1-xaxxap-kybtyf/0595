@@ -58,6 +58,21 @@ public class TileStockRecord extends BaseEntity
     @Excel(name = "操作人员")
     private String operBy;
 
+    /** 备注 */
+    @Excel(name = "备注")
+    private String remark;
+
+    /** 批次号 */
+    @Excel(name = "批次号")
+    private String batchNo;
+
+    /** 货位ID */
+    @Excel(name = "货位ID")
+    private Long locationId;
+
+    /** 货位信息 */
+    private TileWarehouseLocation location;
+
     public void setRecordId(Long recordId) 
     {
         this.recordId = recordId;
@@ -178,6 +193,46 @@ public class TileStockRecord extends BaseEntity
         return operBy;
     }
 
+    public void setRemark(String remark) 
+    {
+        this.remark = remark;
+    }
+
+    public String getRemark() 
+    {
+        return remark;
+    }
+
+    public void setBatchNo(String batchNo) 
+    {
+        this.batchNo = batchNo;
+    }
+
+    public String getBatchNo() 
+    {
+        return batchNo;
+    }
+
+    public void setLocationId(Long locationId) 
+    {
+        this.locationId = locationId;
+    }
+
+    public Long getLocationId() 
+    {
+        return locationId;
+    }
+
+    public void setLocation(TileWarehouseLocation location) 
+    {
+        this.location = location;
+    }
+
+    public TileWarehouseLocation getLocation() 
+    {
+        return location;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
@@ -194,6 +249,9 @@ public class TileStockRecord extends BaseEntity
             .append("operTime", getOperTime())
             .append("operBy", getOperBy())
             .append("remark", getRemark())
+            .append("batchNo", getBatchNo())
+            .append("locationId", getLocationId())
+            .append("location", getLocation())
             .toString();
     }
 }

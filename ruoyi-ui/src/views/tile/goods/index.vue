@@ -114,6 +114,8 @@
       <el-table-column label="商品编号" align="center" prop="goodsCode" min-width="120" />
       <el-table-column label="商品分类" align="center" prop="categoryName" min-width="120" />
       <el-table-column label="商品规格" align="center" prop="specName" min-width="120" />
+      <el-table-column label="每箱片数" align="center" prop="piecesPerBox" min-width="100" />
+      <el-table-column label="每箱重量(kg)" align="center" prop="weightPerBox" min-width="100" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180" />
       <el-table-column label="状态" align="center" width="100">
         <template #default="scope">

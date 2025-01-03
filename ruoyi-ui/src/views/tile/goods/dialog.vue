@@ -93,6 +93,18 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
+          <el-form-item label="每箱片数" prop="piecesPerBox">
+            <el-input-number v-model="form.piecesPerBox" :min="1" :max="100" controls-position="right" style="width: 100%" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="每箱重量" prop="weightPerBox">
+            <el-input-number v-model="form.weightPerBox" :min="0" :precision="2" :step="0.1" controls-position="right" style="width: 100%">
+              <template #suffix>kg</template>
+            </el-input-number>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
           <el-form-item label="状态">
             <el-radio-group v-model="form.status">
               <el-radio :value="'0'">上架</el-radio>
@@ -183,17 +195,19 @@ const form = ref({
   goodsId: undefined,
   goodsCode: undefined,
   goodsName: undefined,
-  goodsImage: undefined,
   categoryId: undefined,
   specId: undefined,
   materialId: undefined,
   surfaceId: undefined,
   usageId: undefined,
   patternId: undefined,
+  piecesPerBox: 10,
+  weightPerBox: 0.00,
+  goodsImage: undefined,
   status: '0'
 })
 
-const rules = {
+const rules = ref({
   goodsCode: [
     { required: true, message: '商品编号不能为空', trigger: 'blur' }
   ],
@@ -203,10 +217,16 @@ const rules = {
   specId: [
     { required: true, message: '规格尺寸不能为空', trigger: 'change' }
   ],
+  piecesPerBox: [
+    { required: true, message: '每箱片数不能为空', trigger: 'blur' }
+  ],
+  weightPerBox: [
+    { required: true, message: '每箱重量不能为空', trigger: 'blur' }
+  ],
   goodsImage: [
     { required: true, message: '商品主图不能为空', trigger: 'change' }
   ]
-}
+})
 
 function handleUploadSuccess(response) {
   form.value.goodsImage = response.url
@@ -247,13 +267,15 @@ function reset() {
     goodsId: undefined,
     goodsCode: undefined,
     goodsName: undefined,
-    goodsImage: undefined,
     categoryId: undefined,
     specId: undefined,
     materialId: undefined,
     surfaceId: undefined,
     usageId: undefined,
     patternId: undefined,
+    piecesPerBox: 10,
+    weightPerBox: 0.00,
+    goodsImage: undefined,
     status: '0'
   }
 }

@@ -11,6 +11,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="quantity"    column="quantity"     />
         <result property="price"       column="price"        />
         <result property="amount"      column="amount"       />
+        <result property="batchNo"     column="batch_no"     />
+        <result property="locationId"  column="location_id"  />
+        <result property="unit"        column="unit"         />
+        <result property="locationName" column="location_name" />
         <result property="remark"      column="remark"       />
         <association property="goods"  column="goods_id" javaType="TileGoods" resultMap="goodsResult" />
     </resultMap>
@@ -28,10 +32,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectTileStockInDetailVo">
-        select d.detail_id, d.in_id, d.goods_id, d.quantity, d.price, d.amount, d.remark,
-               g.goods_name, g.goods_code, g.category_id, g.spec_id, g.material_id, g.pattern_id, g.surface_id, g.usage_id
+        select d.detail_id, d.in_id, d.goods_id, d.quantity, d.price, d.amount, d.batch_no, d.location_id, d.unit, d.remark,
+               g.goods_name, g.goods_code, g.category_id, g.spec_id, g.material_id, g.pattern_id, g.surface_id, g.usage_id,
+               l.location_name
         from tile_stock_in_detail d
         left join tile_goods g on g.goods_id = d.goods_id
+        left join tile_warehouse_location l on l.location_id = d.location_id
     </sql>
 
     <select id="selectTileStockInDetailList" parameterType="TileStockInDetail" resultMap="TileStockInDetailResult">
@@ -60,6 +66,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="quantity != null">quantity,</if>
             <if test="price != null">price,</if>
             <if test="amount != null">amount,</if>
+            <if test="batchNo != null and batchNo != ''">batch_no,</if>
+            <if test="locationId != null">location_id,</if>
+            <if test="unit != null">unit,</if>
             <if test="remark != null">remark,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -68,14 +77,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="quantity != null">#{quantity},</if>
             <if test="price != null">#{price},</if>
             <if test="amount != null">#{amount},</if>
+            <if test="batchNo != null and batchNo != ''">#{batchNo},</if>
+            <if test="locationId != null">#{locationId},</if>
+            <if test="unit != null">#{unit},</if>
             <if test="remark != null">#{remark},</if>
          </trim>
     </insert>
 
     <insert id="batchInsertTileStockInDetail">
-        insert into tile_stock_in_detail(in_id, goods_id, quantity, price, amount, remark) values
+        insert into tile_stock_in_detail(in_id, goods_id, quantity, price, amount, batch_no, location_id, unit, remark) values
         <foreach item="item" index="index" collection="list" separator=",">
-            (#{item.inId}, #{item.goodsId}, #{item.quantity}, #{item.price}, #{item.amount}, #{item.remark})
+            (#{item.inId}, #{item.goodsId}, #{item.quantity}, #{item.price}, #{item.amount}, #{item.batchNo}, #{item.locationId}, #{item.unit}, #{item.remark})
         </foreach>
     </insert>
 
@@ -87,6 +99,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="quantity != null">quantity = #{quantity},</if>
             <if test="price != null">price = #{price},</if>
             <if test="amount != null">amount = #{amount},</if>
+            <if test="batchNo != null and batchNo != ''">batch_no = #{batchNo},</if>
+            <if test="locationId != null">location_id = #{locationId},</if>
+            <if test="unit != null">unit = #{unit},</if>
             <if test="remark != null">remark = #{remark},</if>
         </trim>
         where detail_id = #{detailId}

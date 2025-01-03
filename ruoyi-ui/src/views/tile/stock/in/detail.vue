@@ -19,6 +19,9 @@
       <el-table-column type="index" label="序号" width="50" />
       <el-table-column label="商品名称" prop="goodsName" />
       <el-table-column label="数量" prop="quantity" />
+      <el-table-column label="单位" prop="unit" />
+      <el-table-column label="批次号" prop="batchNo" />
+      <el-table-column label="货位" prop="locationName" />
     </el-table>
 
     <div class="mb8" style="margin-top: 20px;">

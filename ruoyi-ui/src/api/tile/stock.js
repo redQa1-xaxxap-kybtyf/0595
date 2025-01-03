@@ -307,3 +307,38 @@ export function cleanStockRecord() {
     method: 'delete'
   })
 }
+
+// 查询销售单列表
+export function listSaleOrder(query) {
+  return request({
+    url: '/tile/sale/order/list',
+    method: 'get',
+    params: query
+  })
+}
+
+// 查询销售单详情
+export function getSaleOrder(orderId) {
+  return request({
+    url: '/tile/sale/order/' + orderId,
+    method: 'get'
+  })
+}
+
+// 查询客户列表
+export function listCustomer(query) {
+  return request({
+    url: '/tile/customer/list',
+    method: 'get',
+    params: query
+  })
+}
+
+// 查询仓位列表
+export function listLocation(query) {
+  return request({
+    url: '/tile/location/list',
+    method: 'get',
+    params: query
+  })
+}

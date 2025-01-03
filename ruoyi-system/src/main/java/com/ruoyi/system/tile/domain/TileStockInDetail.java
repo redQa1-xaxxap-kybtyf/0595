@@ -38,6 +38,25 @@ public class TileStockInDetail extends BaseEntity
     @Excel(name = "入库金额")
     private BigDecimal amount;
 
+    /** 批次号 */
+    @Excel(name = "批次号")
+    private String batchNo;
+
+    /** 生产日期 */
+    @Excel(name = "生产日期")
+    private String productionDate;
+
+    /** 货位ID */
+    @Excel(name = "货位ID")
+    private Long locationId;
+
+    /** 货位名称 */
+    private String locationName;
+
+    /** 单位（1片 2箱） */
+    @Excel(name = "单位", readConverterExp = "1=片,2=箱")
+    private String unit;
+
     /** 商品信息 */
     private TileGoods goods;
 
@@ -101,6 +120,54 @@ public class TileStockInDetail extends BaseEntity
         return amount;
     }
 
+    public void setBatchNo(String batchNo) 
+    {
+        this.batchNo = batchNo;
+    }
+
+    public String getBatchNo() 
+    {
+        return batchNo;
+    }
+
+    public void setProductionDate(String productionDate) 
+    {
+        this.productionDate = productionDate;
+    }
+
+    public String getProductionDate() 
+    {
+        return productionDate;
+    }
+
+    public void setLocationId(Long locationId) 
+    {
+        this.locationId = locationId;
+    }
+
+    public Long getLocationId() 
+    {
+        return locationId;
+    }
+
+    public String getLocationName() {
+        return locationName;
+    }
+
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
+    }
+
+    public void setUnit(String unit) 
+    {
+        this.unit = unit;
+    }
+
+    public String getUnit() 
+    {
+        return unit;
+    }
+
     public TileGoods getGoods() 
     {
         return goods;
@@ -120,6 +187,11 @@ public class TileStockInDetail extends BaseEntity
             .append("quantity", getQuantity())
             .append("price", getPrice())
             .append("amount", getAmount())
+            .append("batchNo", getBatchNo())
+            .append("productionDate", getProductionDate())
+            .append("locationId", getLocationId())
+            .append("locationName", getLocationName())
+            .append("unit", getUnit())
             .append("remark", getRemark())
             .append("goods", getGoods())
             .toString();

@@ -1,10 +1,12 @@
 package com.ruoyi.system.tile.domain;
 
+import java.math.BigDecimal;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
 
 /**
@@ -84,6 +86,14 @@ public class TileGoods extends BaseEntity
 
     /** 图案名称 */
     private String patternName;
+
+    /** 每箱片数 */
+    @Excel(name = "每箱片数")
+    private Integer piecesPerBox;
+
+    /** 每箱重量(公斤) */
+    @Excel(name = "每箱重量(公斤)")
+    private BigDecimal weightPerBox;
 
     public Long getGoodsId()
     {
@@ -295,6 +305,22 @@ public class TileGoods extends BaseEntity
         this.patternName = patternName;
     }
 
+    public Integer getPiecesPerBox() {
+        return piecesPerBox;
+    }
+
+    public void setPiecesPerBox(Integer piecesPerBox) {
+        this.piecesPerBox = piecesPerBox;
+    }
+
+    public BigDecimal getWeightPerBox() {
+        return weightPerBox;
+    }
+
+    public void setWeightPerBox(BigDecimal weightPerBox) {
+        this.weightPerBox = weightPerBox;
+    }
+
     @Override
     public String toString()
     {
@@ -319,6 +345,8 @@ public class TileGoods extends BaseEntity
             .append("updateBy", getUpdateBy())
             .append("updateTime", getUpdateTime())
             .append("remark", getRemark())
+            .append("piecesPerBox", getPiecesPerBox())
+            .append("weightPerBox", getWeightPerBox())
             .toString();
     }
 }

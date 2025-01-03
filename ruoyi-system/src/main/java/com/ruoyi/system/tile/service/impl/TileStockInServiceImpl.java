@@ -10,11 +10,17 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.tile.domain.TileStockIn;
 import com.ruoyi.system.tile.domain.TileStockInDetail;
 import com.ruoyi.system.tile.domain.TileStockRecord;
+import com.ruoyi.system.tile.domain.TileSaleOrder;
+import com.ruoyi.system.tile.domain.TileSaleOrderDetail;
+import com.ruoyi.system.tile.domain.TileGoods;
 import com.ruoyi.system.tile.mapper.TileStockInMapper;
 import com.ruoyi.system.tile.service.ITileStockInService;
 import com.ruoyi.system.tile.service.ITileStockInDetailService;
 import com.ruoyi.system.tile.service.ITileStockService;
 import com.ruoyi.system.tile.service.ITileStockRecordService;
+import com.ruoyi.system.tile.service.ITileSaleOrderService;
+import com.ruoyi.system.tile.service.ITileSaleOrderDetailService;
+import com.ruoyi.system.tile.service.ITileGoodsService;
 
 /**
  * 入库单Service业务层处理
@@ -35,6 +41,15 @@ public class TileStockInServiceImpl implements ITileStockInService
 
     @Autowired
     private ITileStockRecordService tileStockRecordService;
+
+    @Autowired
+    private ITileSaleOrderService tileSaleOrderService;
+
+    @Autowired
+    private ITileSaleOrderDetailService tileSaleOrderDetailService;
+
+    @Autowired
+    private ITileGoodsService tileGoodsService;
 
     /**
      * 查询入库单
@@ -79,10 +94,17 @@ public class TileStockInServiceImpl implements ITileStockInService
         tileStockIn.setCreateTime(DateUtils.getNowDate());
         tileStockIn.setCreateBy(SecurityUtils.getUsername());
         // 生成入库单号
-        String inCode = generateInCode();
+        String inCode = generateInCode(tileStockIn.getInType());
         tileStockIn.setInCode(inCode);
         // 设置初始状态为待入库
         tileStockIn.setStatus("1");
+
+        // 如果是退货入库，需要校验销售单
+        if ("2".equals(tileStockIn.getInType()))
+        {
+            validateReturnStockIn(tileStockIn);
+        }
+
         int rows = tileStockInMapper.insertTileStockIn(tileStockIn);
         if (rows > 0)
         {
@@ -178,24 +200,37 @@ public class TileStockInServiceImpl implements ITileStockInService
         {
             throw new RuntimeException("入库单状态不正确");
         }
+
+        // 如果是退货入库，需要再次校验
+        if ("2".equals(stockIn.getInType()))
+        {
+            validateReturnStockIn(stockIn);
+        }
+
         // 更新库存
         List<TileStockInDetail> details = stockIn.getDetails();
         for (TileStockInDetail detail : details)
         {
-            tileStockService.addStock(detail.getGoodsId(), stockIn.getWarehouseId(), Long.valueOf(detail.getQuantity()));
+            // 计算实际入库数量（考虑单位转换）
+            int actualQuantity = calculateActualQuantity(detail);
+            
+            // 更新库存
+            tileStockService.addStock(detail.getGoodsId(), stockIn.getWarehouseId(), Long.valueOf(actualQuantity));
             
             // 添加库存记录
             TileStockRecord record = new TileStockRecord();
             record.setOperType("1"); // 入库
             record.setGoodsId(detail.getGoodsId());
             record.setWarehouseId(stockIn.getWarehouseId());
-            record.setQuantity(Long.valueOf(detail.getQuantity()));
+            record.setQuantity(Long.valueOf(actualQuantity));
             record.setSourceId(stockIn.getInId());
             record.setSourceType("1"); // 入库单
             record.setSourceCode(stockIn.getInCode());
             record.setOperTime(DateUtils.getTime());
             record.setOperBy(SecurityUtils.getUsername());
             record.setRemark(stockIn.getRemark());
+            record.setBatchNo(detail.getBatchNo());
+            record.setLocationId(detail.getLocationId());
             tileStockRecordService.insertTileStockRecord(record);
         }
         // 更新入库单状态为已入库
@@ -237,10 +272,94 @@ public class TileStockInServiceImpl implements ITileStockInService
 
     /**
      * 生成入库单号
-     * 格式：IN + yyyyMMdd + 4位流水号
+     * 格式：
+     * 采购入库：CGRK + yyyyMMdd + 4位流水号
+     * 退货入库：THRK + yyyyMMdd + 4位流水号
      */
-    private String generateInCode()
+    private String generateInCode(String inType)
     {
-        return "IN" + DateUtils.dateTimeNow() + StringUtils.padl(1, 4);
+        String prefix = "1".equals(inType) ? "CGRK" : "THRK";
+        return prefix + DateUtils.dateTimeNow() + StringUtils.padl(1, 4);
+    }
+
+    /**
+     * 校验退货入库
+     */
+    private void validateReturnStockIn(TileStockIn stockIn)
+    {
+        // 校验销售单是否存在
+        TileSaleOrder saleOrder = tileSaleOrderService.selectTileSaleOrderByOrderId(stockIn.getSaleOrderId());
+        if (saleOrder == null)
+        {
+            throw new RuntimeException("销售单不存在");
+        }
+
+        // 校验客户ID是否匹配
+        if (!saleOrder.getCustomerId().equals(stockIn.getCustomerId()))
+        {
+            throw new RuntimeException("客户信息不匹配");
+        }
+
+        // 获取销售单明细
+        List<TileSaleOrderDetail> saleDetails = tileSaleOrderDetailService.selectTileSaleOrderDetailByOrderId(stockIn.getSaleOrderId());
+        if (saleDetails == null || saleDetails.isEmpty())
+        {
+            throw new RuntimeException("销售单明细不存在");
+        }
+
+        // 校验退货明细
+        for (TileStockInDetail detail : stockIn.getDetails())
+        {
+            boolean found = false;
+            for (TileSaleOrderDetail saleDetail : saleDetails)
+            {
+                if (saleDetail.getProductId().equals(detail.getGoodsId()))
+                {
+                    found = true;
+                    // 校验退货数量不能超过销售数量
+                    int actualQuantity = calculateActualQuantity(detail);
+                    if (actualQuantity > saleDetail.getQuantity().intValue())
+                    {
+                        throw new RuntimeException("商品[" + saleDetail.getProductId() + "]退货数量不能超过销售数量");
+                    }
+                    break;
+                }
+            }
+            if (!found)
+            {
+                throw new RuntimeException("商品[" + detail.getGoodsId() + "]不在原销售单中");
+            }
+        }
+    }
+
+    /**
+     * 计算实际入库数量（考虑单位转换）
+     */
+    private int calculateActualQuantity(TileStockInDetail detail)
+    {
+        // 获取商品信息
+        TileGoods goods = tileGoodsService.selectTileGoodsById(detail.getGoodsId());
+        if (goods == null)
+        {
+            throw new RuntimeException("商品不存在");
+        }
+
+        // 获取每箱片数
+        int piecesPerBox = goods.getPiecesPerBox() != null ? goods.getPiecesPerBox() : 10;
+
+        // 如果单位是箱，需要转换为片
+        if ("箱".equals(detail.getUnit()))
+        {
+            return detail.getQuantity() * piecesPerBox;
+        }
+        // 如果单位是片，直接返回数量
+        else if ("片".equals(detail.getUnit()))
+        {
+            return detail.getQuantity();
+        }
+        else
+        {
+            throw new RuntimeException("不支持的单位类型：" + detail.getUnit());
+        }
     }
 }

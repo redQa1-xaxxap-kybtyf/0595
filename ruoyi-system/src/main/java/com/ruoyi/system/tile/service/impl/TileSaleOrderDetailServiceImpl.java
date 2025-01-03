@@ -33,18 +33,6 @@ public class TileSaleOrderDetailServiceImpl implements ITileSaleOrderDetailServi
     /**
      * 查询销售订单明细列表
      * 
-     * @param tileSaleOrderDetail 销售订单明细
-     * @return 销售订单明细
-     */
-    @Override
-    public List<TileSaleOrderDetail> selectTileSaleOrderDetailList(TileSaleOrderDetail tileSaleOrderDetail)
-    {
-        return tileSaleOrderDetailMapper.selectTileSaleOrderDetailList(tileSaleOrderDetail);
-    }
-
-    /**
-     * 根据订单ID查询明细
-     * 
      * @param orderId 订单ID
      * @return 销售订单明细集合
      */
@@ -52,6 +40,18 @@ public class TileSaleOrderDetailServiceImpl implements ITileSaleOrderDetailServi
     public List<TileSaleOrderDetail> selectTileSaleOrderDetailByOrderId(Long orderId)
     {
         return tileSaleOrderDetailMapper.selectTileSaleOrderDetailByOrderId(orderId);
+    }
+
+    /**
+     * 查询销售订单明细列表
+     * 
+     * @param tileSaleOrderDetail 销售订单明细
+     * @return 销售订单明细
+     */
+    @Override
+    public List<TileSaleOrderDetail> selectTileSaleOrderDetailList(TileSaleOrderDetail tileSaleOrderDetail)
+    {
+        return tileSaleOrderDetailMapper.selectTileSaleOrderDetailList(tileSaleOrderDetail);
     }
 
     /**
@@ -73,7 +73,7 @@ public class TileSaleOrderDetailServiceImpl implements ITileSaleOrderDetailServi
      * @return 结果
      */
     @Override
-    public int insertTileSaleOrderDetails(List<TileSaleOrderDetail> tileSaleOrderDetails)
+    public int batchInsertTileSaleOrderDetail(List<TileSaleOrderDetail> tileSaleOrderDetails)
     {
         return tileSaleOrderDetailMapper.batchInsertTileSaleOrderDetail(tileSaleOrderDetails);
     }

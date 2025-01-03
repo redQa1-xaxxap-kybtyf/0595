@@ -22,7 +22,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="仓库" prop="warehouseId">
-        <el-select v-model="queryParams.warehouseId" id="warehouseId" placeholder="仓库" clearable style="width: 200px">
+        <el-select v-model="queryParams.warehouseId" id="warehouseId" placeholder="仓库" clearable style="width: 200px" @change="handleWarehouseChange">
           <el-option
             v-for="item in warehouseOptions"
             :key="item.warehouseId"
@@ -30,6 +30,26 @@
             :value="item.warehouseId"
           />
         </el-select>
+      </el-form-item>
+      <el-form-item label="货位" prop="locationId" v-if="locationOptions.length > 0">
+        <el-select v-model="queryParams.locationId" id="locationId" placeholder="货位" clearable style="width: 200px">
+          <el-option
+            v-for="item in locationOptions"
+            :key="item.locationId"
+            :label="item.locationName"
+            :value="item.locationId"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="批次号" prop="batchNo">
+        <el-input
+          v-model="queryParams.batchNo"
+          id="batchNo"
+          placeholder="请输入批次号"
+          clearable
+          style="width: 200px"
+          @keyup.enter="handleQuery"
+        />
       </el-form-item>
       <el-form-item label="单据类型" prop="sourceType">
         <el-select v-model="queryParams.sourceType" id="sourceType" placeholder="单据类型" clearable style="width: 200px">
@@ -108,13 +128,29 @@
       </el-table-column>
       <el-table-column label="商品" align="center" prop="goodsName" />
       <el-table-column label="仓库" align="center" prop="warehouseName" />
-      <el-table-column label="数量" align="center" prop="quantity" />
+      <el-table-column label="货位" align="center" prop="locationName" />
+      <el-table-column label="批次号" align="center" prop="batchNo" />
+      <el-table-column label="数量" align="center">
+        <template #default="scope">
+          <span :style="{ color: scope.row.operType === '1' ? '#67C23A' : '#F56C6C' }">
+            {{ scope.row.operType === '1' ? '+' : '-' }}{{ scope.row.quantity }}
+          </span>
+        </template>
+      </el-table-column>
       <el-table-column label="单据类型" align="center" prop="sourceType">
         <template #default="scope">
           {{ getDictLabel(tile_stock_source_type, scope.row.sourceType) }}
         </template>
       </el-table-column>
       <el-table-column label="单据编号" align="center" prop="sourceCode" />
+      <el-table-column label="来源单据" align="center">
+        <template #default="scope">
+          <el-button
+            type="text"
+            @click="handleViewSource(scope.row)"
+          >{{ scope.row.sourceCode }}</el-button>
+        </template>
+      </el-table-column>
       <el-table-column label="操作时间" align="center" prop="operTime" width="180">
         <template #default="scope">
           <span>{{ parseTime(scope.row.operTime) }}</span>
@@ -147,6 +183,7 @@
 <script setup name="StockRecord">
 import { listStockRecord, delStockRecord, cleanStockRecord, exportStockRecord } from "@/api/tile/stock";
 import { listWarehouse } from "@/api/tile/warehouse";
+import { listLocation } from "@/api/tile/stock";
 import { listGoods } from "@/api/tile/goods";
 import { getCurrentInstance, ref, reactive, onMounted } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
@@ -180,6 +217,8 @@ const dateRange = ref([]);
 const warehouseOptions = ref([]);
 // 商品选项列表
 const goodsOptions = ref([]);
+// 货位选项列表
+const locationOptions = ref([]);
 
 // 查询参数
 const queryParams = ref({
@@ -189,7 +228,9 @@ const queryParams = ref({
   goodsId: null,
   operType: null,
   sourceType: null,
-  sourceCode: null
+  sourceCode: null,
+  batchNo: null,
+  locationId: null
 });
 
 /** 查询库存记录列表 */
@@ -216,6 +257,20 @@ function getGoodsList() {
   });
 }
 
+/** 仓库选择改变事件 */
+function handleWarehouseChange(value) {
+  queryParams.value.locationId = undefined;
+  if (value) {
+    listLocation({
+      warehouseId: value
+    }).then(response => {
+      locationOptions.value = response.rows;
+    });
+  } else {
+    locationOptions.value = [];
+  }
+}
+
 // 多选框选中数据
 function handleSelectionChange(selection) {
   ids.value = selection.map(item => item.recordId);
@@ -233,7 +288,8 @@ function handleQuery() {
 function resetQuery() {
   dateRange.value = [];
   proxy.resetForm("queryRef");
-  queryParams.value.pageNum = 1;
+  queryParams.value.locationId = undefined;
+  locationOptions.value = [];
   handleQuery();
 }
 
@@ -285,6 +341,19 @@ function getDictLabel(dicts, value) {
   if (!dicts || !value) return '';
   const dict = dicts.find(dict => dict.value === value);
   return dict ? dict.label : '';
+}
+
+/** 查看来源单据 */
+function handleViewSource(row) {
+  const sourceType = row.sourceType;
+  const sourceId = row.sourceId;
+  
+  // 根据单据类型跳转到不同的页面
+  if (sourceType === "IN") {
+    proxy.$router.push({ path: '/tile/stock/in/detail', query: { inId: sourceId }});
+  } else if (sourceType === "OUT") {
+    proxy.$router.push({ path: '/tile/stock/out/detail', query: { outId: sourceId }});
+  }
 }
 
 onMounted(() => {
