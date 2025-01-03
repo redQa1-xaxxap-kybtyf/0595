@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.tile.mapper.TileCustomerMapper">
+    
+    <resultMap type="TileCustomer" id="TileCustomerResult">
+        <result property="customerId"    column="customer_id"    />
+        <result property="customerName"  column="customer_name"  />
+        <result property="customerType"  column="customer_type"  />
+        <result property="contactName"   column="contact_name"   />
+        <result property="phone"         column="phone"          />
+        <result property="address"       column="address"        />
+        <result property="status"        column="status"         />
+        <result property="delFlag"       column="del_flag"       />
+        <result property="createBy"      column="create_by"      />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"      column="update_by"      />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"        column="remark"         />
+    </resultMap>
+
+    <sql id="selectTileCustomerVo">
+        select customer_id, customer_name, customer_type, contact_name, phone, address, status, del_flag, create_by, create_time, update_by, update_time, remark 
+        from tile_customer
+    </sql>
+
+    <select id="selectTileCustomerList" parameterType="TileCustomer" resultMap="TileCustomerResult">
+        <include refid="selectTileCustomerVo"/>
+        <where>  
+            <if test="customerName != null  and customerName != ''"> and customer_name like concat('%', #{customerName}, '%')</if>
+            <if test="customerType != null  and customerType != ''"> and customer_type = #{customerType}</if>
+            <if test="contactName != null  and contactName != ''"> and contact_name like concat('%', #{contactName}, '%')</if>
+            <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            and del_flag = '0'
+        </where>
+    </select>
+    
+    <select id="selectTileCustomerByCustomerId" parameterType="Long" resultMap="TileCustomerResult">
+        <include refid="selectTileCustomerVo"/>
+        where customer_id = #{customerId} and del_flag = '0'
+    </select>
+        
+    <insert id="insertTileCustomer" parameterType="TileCustomer" useGeneratedKeys="true" keyProperty="customerId">
+        insert into tile_customer
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="customerName != null">customer_name,</if>
+            <if test="customerType != null">customer_type,</if>
+            <if test="contactName != null">contact_name,</if>
+            <if test="phone != null">phone,</if>
+            <if test="address != null">address,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="customerName != null">#{customerName},</if>
+            <if test="customerType != null">#{customerType},</if>
+            <if test="contactName != null">#{contactName},</if>
+            <if test="phone != null">#{phone},</if>
+            <if test="address != null">#{address},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTileCustomer" parameterType="TileCustomer">
+        update tile_customer
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="customerName != null">customer_name = #{customerName},</if>
+            <if test="customerType != null">customer_type = #{customerType},</if>
+            <if test="contactName != null">contact_name = #{contactName},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where customer_id = #{customerId}
+    </update>
+
+    <delete id="deleteTileCustomerByCustomerId" parameterType="Long">
+        update tile_customer set del_flag = '2' where customer_id = #{customerId}
+    </delete>
+
+    <delete id="deleteTileCustomerByCustomerIds" parameterType="String">
+        update tile_customer set del_flag = '2' where customer_id in 
+        <foreach item="customerId" collection="array" open="(" separator="," close=")">
+            #{customerId}
+        </foreach>
+    </delete>
+</mapper>
