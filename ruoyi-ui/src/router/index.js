@@ -213,6 +213,12 @@ export const dynamicRoutes = [
         component: () => import('@/views/tile/stock/location/index'),
         name: 'TileStockLocation',
         meta: { title: '货位管理', icon: 'form' }
+      },
+      {
+        path: 'partner/supplier',
+        component: () => import('@/views/tile/partner/supplier/index'),
+        name: 'Supplier',
+        meta: { title: '供应商管理', icon: 'user' }
       }
     ]
   }

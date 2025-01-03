@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.tile.mapper.TileSupplierMapper">
+    
+    <resultMap type="TileSupplier" id="TileSupplierResult">
+        <result property="supplierId"    column="supplier_id"    />
+        <result property="supplierName"  column="supplier_name"  />
+        <result property="contactName"   column="contact_name"   />
+        <result property="contactPhone"  column="contact_phone"  />
+        <result property="address"       column="address"        />
+        <result property="status"        column="status"         />
+        <result property="delFlag"       column="del_flag"       />
+        <result property="createBy"      column="create_by"      />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"      column="update_by"      />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"        column="remark"         />
+        <collection property="prices" ofType="TileSupplierPrice">
+            <result property="priceId"      column="price_id"      />
+            <result property="supplierId"   column="price_supplier_id" />
+            <result property="supplierName" column="price_supplier_name" />
+            <result property="categoryName"    column="category_name"    />
+            <result property="specification"   column="specification"   />
+            <result property="model"          column="model"          />
+            <result property="piecePrice"   column="piece_price"   />
+            <result property="squarePrice"  column="square_price"  />
+            <result property="unitPrice"    column="unit_price"    />
+            <result property="status"       column="price_status"  />
+            <result property="delFlag"      column="price_del_flag"      />
+            <result property="createBy"     column="price_create_by"     />
+            <result property="createTime"   column="price_create_time"   />
+            <result property="updateBy"     column="price_update_by"     />
+            <result property="updateTime"   column="price_update_time"   />
+            <result property="remark"       column="price_remark"        />
+        </collection>
+    </resultMap>
+
+    <sql id="selectTileSupplierVo">
+        select s.supplier_id, s.supplier_name, s.contact_name, s.contact_phone, s.address, s.status, 
+               s.del_flag, s.create_by, s.create_time, s.update_by, s.update_time, s.remark,
+               p.price_id, p.supplier_id as price_supplier_id, s.supplier_name as price_supplier_name, 
+               p.category_name, p.specification, p.model, p.piece_price, p.square_price, p.unit_price, 
+               p.status as price_status, p.del_flag as price_del_flag, p.create_by as price_create_by, 
+               p.create_time as price_create_time, p.update_by as price_update_by, 
+               p.update_time as price_update_time, p.remark as price_remark
+        from tile_supplier s
+        left join tile_supplier_price p on s.supplier_id = p.supplier_id and p.del_flag = '0'
+    </sql>
+
+    <select id="selectTileSupplierList" parameterType="TileSupplier" resultMap="TileSupplierResult">
+        <include refid="selectTileSupplierVo"/>
+        <where>  
+            <if test="supplierName != null  and supplierName != ''"> and s.supplier_name like concat('%', #{supplierName}, '%')</if>
+            <if test="contactName != null  and contactName != ''"> and s.contact_name like concat('%', #{contactName}, '%')</if>
+            <if test="contactPhone != null  and contactPhone != ''"> and s.contact_phone = #{contactPhone}</if>
+            <if test="address != null  and address != ''"> and s.address = #{address}</if>
+            <if test="status != null  and status != ''"> and s.status = #{status}</if>
+            and s.del_flag = '0'
+        </where>
+    </select>
+    
+    <select id="selectTileSupplierBySupplierId" parameterType="Long" resultMap="TileSupplierResult">
+        <include refid="selectTileSupplierVo"/>
+        where s.supplier_id = #{supplierId} and s.del_flag = '0'
+    </select>
+        
+    <insert id="insertTileSupplier" parameterType="TileSupplier" useGeneratedKeys="true" keyProperty="supplierId">
+        insert into tile_supplier
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="supplierName != null">supplier_name,</if>
+            <if test="contactName != null">contact_name,</if>
+            <if test="contactPhone != null">contact_phone,</if>
+            <if test="address != null">address,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="supplierName != null">#{supplierName},</if>
+            <if test="contactName != null">#{contactName},</if>
+            <if test="contactPhone != null">#{contactPhone},</if>
+            <if test="address != null">#{address},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTileSupplier" parameterType="TileSupplier">
+        update tile_supplier
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="supplierName != null">supplier_name = #{supplierName},</if>
+            <if test="contactName != null">contact_name = #{contactName},</if>
+            <if test="contactPhone != null">contact_phone = #{contactPhone},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where supplier_id = #{supplierId}
+    </update>
+
+    <delete id="deleteTileSupplierBySupplierId" parameterType="Long">
+        update tile_supplier set del_flag = '2' where supplier_id = #{supplierId}
+    </delete>
+
+    <delete id="deleteTileSupplierBySupplierIds" parameterType="String">
+        update tile_supplier set del_flag = '2' where supplier_id in 
+        <foreach item="supplierId" collection="array" open="(" separator="," close=")">
+            #{supplierId}
+        </foreach>
+    </delete>
+</mapper>
