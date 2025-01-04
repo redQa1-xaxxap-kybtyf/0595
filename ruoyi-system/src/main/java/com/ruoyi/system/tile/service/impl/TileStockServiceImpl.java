@@ -98,30 +98,40 @@ public class TileStockServiceImpl implements ITileStockService
      * @param goodsId 商品ID
      * @param warehouseId 仓库ID
      * @param quantity 增加数量
+     * @param batchNo 批次号
+     * @param locationId 货位ID
      * @return 结果
      */
     @Override
-    public int addStock(Long goodsId, Long warehouseId, Long quantity)
+    public int addStock(Long goodsId, Long warehouseId, Long quantity, String batchNo, Long locationId)
     {
-        TileStock stock = new TileStock();
-        stock.setGoodsId(goodsId);
-        stock.setWarehouseId(warehouseId);
-        stock.setStatus("0");
-
-        List<TileStock> stocks = tileStockMapper.selectTileStockList(stock);
-
+        // 查询是否已存在该商品的库存记录（相同商品、仓库、批次号和货位）
+        TileStock param = new TileStock();
+        param.setGoodsId(goodsId);
+        param.setWarehouseId(warehouseId);
+        param.setBatchNo(batchNo);
+        param.setPositionId(locationId);
+        param.setStatus("0"); // 正常状态
+        List<TileStock> stocks = tileStockMapper.selectTileStockList(param);
+        
         if (stocks != null && !stocks.isEmpty())
         {
-            // 存在则更新
-            TileStock existStock = stocks.get(0);
-            existStock.setQuantity(existStock.getQuantity() + quantity);
-            return tileStockMapper.updateTileStock(existStock);
+            // 如果存在，则更新库存数量
+            TileStock stock = stocks.get(0);
+            stock.setQuantity(stock.getQuantity() + quantity);
+            return updateTileStock(stock);
         }
         else
         {
-            // 不存在则新增
+            // 如果不存在，则新增库存记录
+            TileStock stock = new TileStock();
+            stock.setGoodsId(goodsId);
+            stock.setWarehouseId(warehouseId);
             stock.setQuantity(quantity);
-            return tileStockMapper.insertTileStock(stock);
+            stock.setBatchNo(batchNo);
+            stock.setPositionId(locationId);
+            stock.setStatus("0"); // 正常状态
+            return insertTileStock(stock);
         }
     }
 
@@ -136,12 +146,12 @@ public class TileStockServiceImpl implements ITileStockService
     @Override
     public int subtractStock(Long goodsId, Long warehouseId, Long quantity)
     {
-        TileStock stock = new TileStock();
-        stock.setGoodsId(goodsId);
-        stock.setWarehouseId(warehouseId);
-        stock.setStatus("0");
+        TileStock param = new TileStock();
+        param.setGoodsId(goodsId);
+        param.setWarehouseId(warehouseId);
+        param.setStatus("0"); // 正常状态
 
-        List<TileStock> stocks = tileStockMapper.selectTileStockList(stock);
+        List<TileStock> stocks = tileStockMapper.selectTileStockList(param);
 
         if (stocks != null && !stocks.isEmpty())
         {

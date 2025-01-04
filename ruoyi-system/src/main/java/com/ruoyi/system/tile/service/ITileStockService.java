@@ -64,9 +64,11 @@ public interface ITileStockService
      * @param goodsId 商品ID
      * @param warehouseId 仓库ID
      * @param quantity 增加数量
+     * @param batchNo 批次号
+     * @param locationId 货位ID
      * @return 结果
      */
-    public int addStock(Long goodsId, Long warehouseId, Long quantity);
+    public int addStock(Long goodsId, Long warehouseId, Long quantity, String batchNo, Long locationId);
 
     /**
      * 减少库存
